@@ -1,0 +1,88 @@
+<div class="catalogo-container">
+  <div class="catalogo-header">
+    <h1>Nuestra Tienda</h1>
+    <p>Encuentra las flores perfectas para cada ocasión</p>
+  </div>
+
+  <div class="filtros-container">
+    <div class="busqueda">
+      <input
+        type="text"
+        [(ngModel)]="terminoBusqueda"
+        (ngModelChange)="onBusquedaChange()"
+        placeholder="Buscar flores..."
+        class="input-busqueda"
+      />
+    </div>
+
+    <div class="categorias">
+      @for (categoria of categorias; track categoria) {
+        <button
+          [class.active]="categoriaSeleccionada === categoria"
+          (click)="onCategoriaChange(categoria)"
+          class="btn-categoria"
+        >
+          {{ getCategoriaLabel(categoria) }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="productos-grid">
+    @if (productosFiltrados.length === 0) {
+      <div class="no-productos">
+        <p>No se encontraron productos</p>
+      </div>
+    }
+
+    @for (producto of productosFiltrados; track producto.id) {
+      <div class="producto-card">
+        <div class="producto-imagen">
+          <img [src]="producto.imagen" [alt]="producto.nombre" />
+          @if (producto.stock === 0) {
+            <div class="badge-sin-stock">Sin stock</div>
+          }
+        </div>
+
+        <div class="producto-info">
+          <h3>{{ producto.nombre }}</h3>
+          <p class="producto-descripcion">{{ producto.descripcion }}</p>
+          
+          <div class="producto-footer">
+            <div class="precio-stock">
+              <span class="precio">${{ producto.precio.toFixed(2) }}</span>
+              <span class="stock">Stock: {{ producto.stock }}</span>
+            </div>
+
+            <div class="producto-acciones">
+              <button
+                (click)="agregarAlCarrito(producto)"
+                [disabled]="producto.stock === 0"
+                class="btn-agregar"
+              >
+                Agregar
+              </button>
+
+              @if (authService.isAdmin()) {
+                <button
+                  (click)="editarProducto(producto)"
+                  class="btn-admin btn-editar"
+                  title="Editar producto"
+                >
+                  Editar
+                </button>
+                <button
+                  (click)="eliminarProducto(producto)"
+                  class="btn-admin btn-eliminar"
+                  title="Eliminar producto"
+                >
+                  Eliminar
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

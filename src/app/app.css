@@ -1,0 +1,159 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f5f2ed;
+}
+
+.navbar {
+  background: #e8e3dc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #d4cfc5;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 18px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #5a4f45;
+  text-decoration: none;
+  letter-spacing: -0.3px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #6b5f52;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.nav-links a:hover {
+  background: #d4cfc5;
+  color: #3a3530;
+}
+
+.nav-links a.active {
+  background: #a89584;
+  color: #fff;
+}
+
+.admin-link {
+  background: #c9b59a !important;
+  color: #3a3530 !important;
+  font-weight: 600;
+}
+
+.admin-link:hover {
+  background: #b8a389 !important;
+}
+
+.carrito-link {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #8b7355;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.btn-logout {
+  background: transparent;
+  color: #6b5f52;
+  border: 1px solid #c9c0b5;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.btn-logout:hover {
+  background: #d4cfc5;
+  border-color: #a89584;
+  color: #3a3530;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #7a6e5f;
+  font-size: 0.9rem;
+}
+
+.role-badge {
+  background: #8b7355;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.main-content {
+  min-height: calc(100vh - 140px);
+}
+
+.footer {
+  background: #e8e3dc;
+  padding: 25px;
+  text-align: center;
+  color: #8a7f72;
+  border-top: 1px solid #d4cfc5;
+  margin-top: 60px;
+}
+
+@media (max-width: 968px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .user-info {
+    order: -1;
+  }
+}

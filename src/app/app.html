@@ -1,0 +1,44 @@
+@if (authService.isAuthenticated()) {
+  <nav class="navbar">
+    <div class="nav-container">
+      <a class="brand" routerLink="/">FlorerIA</a>
+      
+      <div class="nav-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+        <a routerLink="/tienda" routerLinkActive="active">Tienda</a>
+        <a routerLink="/arreglo-personalizado" routerLinkActive="active">Crear Arreglo</a>
+        <a routerLink="/chat" routerLinkActive="active">Chatbot</a>
+        
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="active" class="admin-link">Admin</a>
+        }
+        
+        <a routerLink="/carrito" routerLinkActive="active" class="carrito-link">
+          Carrito 
+          @if (carritoService.cantidadTotal() > 0) {
+            <span class="badge">{{ carritoService.cantidadTotal() }}</span>
+          }
+        </a>
+        
+        <button (click)="logout()" class="btn-logout">Salir</button>
+      </div>
+
+      <div class="user-info">
+        <span>{{ authService.currentUser()?.nombre }}</span>
+        @if (authService.isAdmin()) {
+          <span class="role-badge">ADMIN</span>
+        }
+      </div>
+    </div>
+  </nav>
+}
+
+<div class="main-content">
+  <router-outlet></router-outlet>
+</div>
+
+@if (authService.isAuthenticated()) {
+  <footer class="footer">
+    <p>2026 FlorerIA · Sistema de Gestión de Floristería</p>
+  </footer>
+}

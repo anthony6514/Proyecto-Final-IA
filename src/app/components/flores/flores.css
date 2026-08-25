@@ -1,0 +1,66 @@
+.flores-section {
+  background: #fffdfa;
+  border: 1px solid #ded4c8;
+  padding: 28px;
+}
+
+.section-heading {
+  border-bottom: 1px solid #ded4c8;
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+}
+
+.section-label {
+  color: #9a7664;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.flores-section h2 {
+  color: #3f3731;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+}
+
+.flores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: #ded4c8;
+}
+
+.flor-card {
+  background: #fffdfa;
+  padding: 20px;
+}
+
+.flor-code {
+  color: #9a7664;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 34px;
+}
+
+.flor-card h3 {
+  color: #3f3731;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.flor-card p {
+  color: #766b62;
+  font-size: 0.9em;
+  line-height: 1.55;
+}
+
+@media (max-width: 768px) {
+  .flores-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,133 @@
+<div class="arreglo-container">
+  <h1>🎨 Crea tu Arreglo Personalizado</h1>
+  <p class="subtitle">Diseña el arreglo floral perfecto a tu medida</p>
+
+  <div class="arreglo-content">
+    <div class="arreglo-form">
+      <!-- Paso 1: Contenedor -->
+      <div class="form-section">
+        <h2>1. Elige el contenedor</h2>
+        <div class="contenedores-grid">
+          @for (contenedor of contenedores; track contenedor.id) {
+            <div 
+              [class.selected]="contenedorSeleccionado === contenedor.id"
+              (click)="contenedorSeleccionado = contenedor.id"
+              class="contenedor-opcion"
+            >
+              <span class="contenedor-nombre">{{ contenedor.nombre }}</span>
+              <span class="contenedor-precio">${{ contenedor.precio }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Paso 2: Flores -->
+      <div class="form-section">
+        <h2>2. Selecciona tus flores</h2>
+        <div class="flores-form">
+          <select [(ngModel)]="florActual" (ngModelChange)="onFlorChange()" class="select-input">
+            @for (flor of floresDisponibles; track flor.tipo) {
+              <option [ngValue]="flor">{{ flor.tipo }} - ${{ flor.precio }} c/u</option>
+            }
+          </select>
+
+          <select [(ngModel)]="colorActual" class="select-input">
+            @for (color of florActual.colores; track color) {
+              <option [value]="color">{{ color }}</option>
+            }
+          </select>
+
+          <input 
+            type="number" 
+            [(ngModel)]="cantidadActual" 
+            min="1" 
+            max="50"
+            class="number-input"
+          />
+
+          <button (click)="agregarFlor()" class="btn-add">+ Agregar</button>
+        </div>
+
+        @if (floresSeleccionadas.length > 0) {
+          <div class="flores-seleccionadas">
+            <h3>Flores en tu arreglo:</h3>
+            @for (flor of floresSeleccionadas; track $index) {
+              <div class="flor-item">
+                <span>{{ flor.cantidad }}x {{ flor.tipo }} {{ flor.color }}</span>
+                <span class="flor-precio">${{ (flor.cantidad * flor.precioUnitario).toFixed(2) }}</span>
+                <button (click)="eliminarFlor($index)" class="btn-remove">×</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Paso 3: Extras -->
+      <div class="form-section">
+        <h2>3. Extras opcionales</h2>
+        <div class="extras-grid">
+          @for (extra of extras; track extra.id) {
+            <div 
+              [class.selected]="extra.seleccionado"
+              (click)="toggleExtra(extra)"
+              class="extra-opcion"
+            >
+              <span>{{ extra.nombre }}</span>
+              <span class="extra-precio">+${{ extra.precio }}</span>
+              @if (extra.seleccionado) {
+                <span class="check-mark">✓</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Paso 4: Mensaje -->
+      <div class="form-section">
+        <h2>4. Mensaje personalizado (opcional)</h2>
+        <textarea
+          [(ngModel)]="mensaje"
+          placeholder="Escribe un mensaje especial..."
+          class="mensaje-textarea"
+          maxlength="200"
+        ></textarea>
+        <small>{{ mensaje.length }}/200 caracteres</small>
+      </div>
+
+      <div class="form-actions">
+        <button (click)="reiniciar()" class="btn-secondary">Reiniciar</button>
+        <button (click)="agregarAlCarrito()" class="btn-primary">Agregar al Carrito</button>
+      </div>
+    </div>
+
+    <!-- Panel resumen -->
+    <div class="arreglo-resumen">
+      <h2>Tu Arreglo</h2>
+      
+      <div class="resumen-section">
+        <h3>Contenedor:</h3>
+        <p>{{ contenedores.find(c => c.id === contenedorSeleccionado)?.nombre }}</p>
+        <span class="resumen-precio">${{ precioContenedor }}</span>
+      </div>
+
+      @if (floresSeleccionadas.length > 0) {
+        <div class="resumen-section">
+          <h3>Flores ({{ floresSeleccionadas.length }} tipos):</h3>
+          <span class="resumen-precio">${{ precioFlores.toFixed(2) }}</span>
+        </div>
+      }
+
+      @if (precioExtras > 0) {
+        <div class="resumen-section">
+          <h3>Extras:</h3>
+          <span class="resumen-precio">${{ precioExtras.toFixed(2) }}</span>
+        </div>
+      }
+
+      <div class="resumen-total">
+        <span>TOTAL:</span>
+        <span class="total-precio">${{ precioTotal.toFixed(2) }}</span>
+      </div>
+    </div>
+  </div>
+</div>

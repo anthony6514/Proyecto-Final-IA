@@ -1,0 +1,13 @@
+<div class="flores-section">
+  <div class="section-heading">
+    <p class="section-label">Selección de temporada</p>
+    <h2>Flores para decirlo mejor</h2>
+  </div>
+  <div class="flores-grid">
+    <div class="flor-card" *ngFor="let flor of flores">
+      <div class="flor-code">{{ flor.emoji }}</div>
+      <h3>{{ flor.nombre }}</h3>
+      <p>{{ flor.descripcion }}</p>
+    </div>
+  </div>
+</div>

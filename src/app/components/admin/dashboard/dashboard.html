@@ -1,0 +1,57 @@
+<div class="dashboard-container">
+  <h1>📊 Panel de Administración</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-info">
+        <h3>Total Productos</h3>
+        <p class="stat-value">{{ estadisticas.total }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>Disponibles</h3>
+        <p class="stat-value">{{ estadisticas.disponibles }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">❌</div>
+      <div class="stat-info">
+        <h3>Sin Stock</h3>
+        <p class="stat-value">{{ estadisticas.sinStock }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <h3>Valor Inventario</h3>
+        <p class="stat-value">${{ estadisticas.valorInventario?.toFixed(2) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <a routerLink="/admin/productos" class="action-card">
+      <span class="action-icon">🛠️</span>
+      <h3>Gestionar Productos</h3>
+      <p>Crear, editar y eliminar productos</p>
+    </a>
+
+    <a routerLink="/tienda" class="action-card">
+      <span class="action-icon">🏪</span>
+      <h3>Ver Tienda</h3>
+      <p>Vista de usuario de la tienda</p>
+    </a>
+
+    <a routerLink="/chat" class="action-card">
+      <span class="action-icon">💬</span>
+      <h3>Chatbot</h3>
+      <p>Ayuda y recomendaciones</p>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<div class="carrito-container">
+  <h1>Mi Carrito</h1>
+
+  @if (carritoService.cantidadTotal() === 0) {
+    <div class="carrito-vacio">
+      <p>Tu carrito está vacío</p>
+      <a routerLink="/tienda" class="btn-primary">Ver productos</a>
+    </div>
+  } @else {
+    <div class="carrito-content">
+      <div class="items-lista">
+        @for (item of carritoService.items(); track item.id) {
+          <div class="carrito-item">
+            <img [src]="item.imagen" [alt]="item.nombre" />
+            <div class="item-info">
+              <h3>{{ item.nombre }}</h3>
+              <p class="item-precio">${{ item.precio.toFixed(2) }}</p>
+            </div>
+            <div class="item-cantidad">
+              <button (click)="disminuirCantidad(item.id, item.cantidad)">-</button>
+              <span>{{ item.cantidad }}</span>
+              <button (click)="aumentarCantidad(item.id, item.cantidad)">+</button>
+            </div>
+            <div class="item-subtotal">
+              ${{ (item.precio * item.cantidad).toFixed(2) }}
+            </div>
+            <button (click)="eliminarProducto(item.id)" class="btn-eliminar">Eliminar</button>
+          </div>
+        }
+
+        @for (arreglo of carritoService.arreglosPersonalizados(); track arreglo.id) {
+          <div class="carrito-item arreglo-personalizado">
+            <div class="arreglo-icono">Arreglo</div>
+            <div class="item-info">
+              <h3>Arreglo Personalizado</h3>
+              <p class="arreglo-detalle">{{ arreglo.contenedor }} - {{ arreglo.flores.length }} tipos de flores</p>
+            </div>
+            <div class="item-subtotal">
+              ${{ arreglo.precioTotal.toFixed(2) }}
+            </div>
+            <button (click)="eliminarArreglo(arreglo.id!)" class="btn-eliminar">Eliminar</button>
+          </div>
+        }
+      </div>
+
+      <div class="carrito-resumen">
+        <h2>Resumen de compra</h2>
+        <div class="resumen-linea">
+          <span>Productos:</span>
+          <span>{{ carritoService.cantidadTotal() }}</span>
+        </div>
+        <div class="resumen-linea total">
+          <span>Total:</span>
+          <span>${{ carritoService.precioTotal().toFixed(2) }}</span>
+        </div>
+        <button (click)="procesarCompra()" class="btn-primary btn-comprar">
+          Procesar Compra
+        </button>
+        <button (click)="vaciarCarrito()" class="btn-vaciar">
+          Vaciar Carrito
+        </button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,53 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <div class="bot-avatar">BOT</div>
+    <div class="bot-info">
+      <h3>Asistente Virtual</h3>
+      <span class="status">En línea</span>
+    </div>
+  </div>
+
+  <div class="chat-messages">
+    <div *ngFor="let message of messages" 
+         [class]="message.isBot ? 'message bot-message' : 'message user-message'">
+      <div class="message-avatar" *ngIf="message.isBot">BOT</div>
+      <div class="message-content">
+        <p [innerHTML]="message.text"></p>
+        <span class="message-time">{{ getTimeString(message.timestamp) }}</span>
+      </div>
+      <div class="message-avatar" *ngIf="!message.isBot">TU</div>
+    </div>
+  </div>
+
+  <div class="chat-input-container">
+    <div class="input-buttons">
+      <button class="input-btn" (click)="sendImage()" title="Enviar imagen">
+        <span>Foto</span>
+      </button>
+      <button 
+        class="input-btn" 
+        [class.active]="isRecording"
+        (click)="sendAudio()" 
+        title="Enviar audio">
+        <span>Voz</span>
+      </button>
+    </div>
+    <input 
+      type="text" 
+      [(ngModel)]="userInput"
+      (keyup.enter)="sendMessage()"
+      placeholder="Escribe tu mensaje..."
+      autocomplete="off"
+    >
+    <button class="send-btn" (click)="sendMessage()">
+      <span>Enviar</span>
+    </button>
+  </div>
+
+  <div class="quick-replies">
+    <button class="quick-reply" (click)="sendQuickReply('Hola')">Hola</button>
+    <button class="quick-reply" (click)="sendQuickReply('¿Qué flores tienes?')">Ver flores</button>
+    <button class="quick-reply" (click)="sendQuickReply('Precio')">Precios</button>
+    <button class="quick-reply" (click)="sendQuickReply('Ayuda')">Ayuda</button>
+  </div>
+</div>
