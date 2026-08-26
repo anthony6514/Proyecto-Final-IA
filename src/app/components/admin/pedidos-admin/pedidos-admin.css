@@ -139,11 +139,33 @@
   background: #fff0f3;
   border: 2px solid var(--color-rosa-primario);
   color: var(--color-rosa-oscuro);
-  padding: 20px;
+  padding: 24px 28px;
   border-radius: 16px;
   margin-bottom: 20px;
   font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
 }
+
+.btn-retry {
+  background: linear-gradient(135deg, var(--color-rosa-primario), var(--color-rosa-oscuro));
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-retry:hover { transform: translateY(-2px); box-shadow: var(--sombra-media); }
 
 /* Tabla */
 .table-container {
@@ -257,6 +279,12 @@
   text-align: center;
   box-shadow: var(--sombra-media);
   border: 2px solid var(--color-borde-suave);
+}
+
+.empty-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  line-height: 1;
 }
 
 .empty-state p {

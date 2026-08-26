@@ -16,7 +16,7 @@ export class PedidosAdmin implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   selectedOrder: Order | null = null;
-  isLoading = false;
+  isLoading = true;
   errorMessage = '';
   filterStatus: string = 'TODOS';
   searchTerm: string = '';
@@ -45,8 +45,10 @@ export class PedidosAdmin implements OnInit {
       },
       error: (error) => {
         console.error('Error loading orders:', error);
-        this.errorMessage = 'Error al cargar los pedidos. Por favor, intenta de nuevo.';
+        this.errorMessage = 'No se pudieron cargar los pedidos. Verifica que el servidor esté activo.';
         this.isLoading = false;
+        this.orders = [];
+        this.filteredOrders = [];
       }
     });
   }
