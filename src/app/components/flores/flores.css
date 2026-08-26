@@ -1,66 +1,120 @@
 .flores-section {
-  background: #fffdfa;
-  border: 1px solid #ded4c8;
-  padding: 28px;
+  background: linear-gradient(135deg, var(--color-blanco) 0%, var(--color-crema) 100%);
+  border: 2px solid var(--color-borde-suave);
+  padding: 35px;
+  border-radius: 25px;
+  box-shadow: var(--sombra-media);
+  margin: 40px 0;
 }
 
 .section-heading {
-  border-bottom: 1px solid #ded4c8;
-  margin-bottom: 20px;
-  padding-bottom: 18px;
+  border-bottom: 2px solid var(--color-borde-medio);
+  margin-bottom: 30px;
+  padding-bottom: 25px;
 }
 
 .section-label {
-  color: #9a7664;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--color-rosa-primario) 0%, var(--color-lavanda) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  margin-bottom: 12px;
   text-transform: uppercase;
 }
 
+.section-label::before {
+  content: "🌸 ";
+}
+
 .flores-section h2 {
-  color: #3f3731;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.7rem;
-  font-weight: 400;
+  color: var(--color-texto-primario);
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-rosa-primario) 0%, var(--color-lavanda) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .flores-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: #ded4c8;
+  gap: 2px;
+  background: var(--color-borde-medio);
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .flor-card {
-  background: #fffdfa;
-  padding: 20px;
+  background: var(--color-blanco);
+  padding: 30px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.flor-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(244, 166, 184, 0.05) 0%, rgba(197, 163, 217, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.flor-card:hover::before {
+  opacity: 1;
+}
+
+.flor-card:hover {
+  transform: scale(1.02);
+  z-index: 1;
 }
 
 .flor-code {
-  color: #9a7664;
-  font-size: 0.75rem;
-  font-weight: 700;
-  margin-bottom: 34px;
+  background: linear-gradient(135deg, var(--color-rosa-primario) 0%, var(--color-lavanda) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 .flor-card h3 {
-  color: #3f3731;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.2rem;
-  font-weight: 400;
-  margin-bottom: 10px;
+  color: var(--color-texto-primario);
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .flor-card p {
-  color: #766b62;
-  font-size: 0.9em;
-  line-height: 1.55;
+  color: var(--color-texto-secundario);
+  font-size: 0.95em;
+  line-height: 1.7;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
   .flores-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .flores-section {
+    padding: 25px;
   }
 }

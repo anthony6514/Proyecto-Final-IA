@@ -1,12 +1,153 @@
+/* ================================================
+   Variables globales – FlorerIA
+   ================================================ */
+:root {
+  --color-rosa-primario:  #f4a6b8;
+  --color-rosa-hover:     #e88ba0;
+  --color-rosa-oscuro:    #d16b83;
+
+  --color-lavanda:        #c5a3d9;
+  --color-lavanda-claro:  #e6d5f0;
+  --color-verde-suave:    #7eb09b;
+  --color-verde-hover:    #5a9880;
+
+  --color-fondo-claro:    #fef8f9;
+  --color-fondo-crema:    #fff5f7;
+  --color-crema:          #fdeef1;
+  --color-blanco:         #ffffff;
+
+  --color-texto-primario:   #4a3842;
+  --color-texto-secundario: #7a6670;
+  --color-texto-suave:      #9c8893;
+
+  --color-borde-suave: #f4d4dd;
+  --color-borde-medio: #ead0d9;
+
+  --sombra-suave: 0 4px 12px rgba(244, 166, 184, 0.15);
+  --sombra-media: 0 8px 24px rgba(244, 166, 184, 0.25);
+  --sombra-hover: 0 12px 32px rgba(244, 166, 184, 0.35);
+
+  --color-exito:      #7eb09b;
+  --color-advertencia:#f4c06d;
+  --color-error:      #e88ba0;
+}
+
+/* ================================================
+   Reset
+   ================================================ */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ================================================
+   Body – fondo animado suave
+   ================================================ */
 body {
-  background: #f5f2ed;
-  color: #3a3530;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8eaf6 25%, #ede7f6 50%, #fce4ec 75%, #fdf6e3 100%);
+  background-size: 400% 400%;
+  animation: bgBreath 18s ease infinite;
+  color: var(--color-texto-primario);
   min-height: 100vh;
+  overflow-x: hidden;
 }
+
+@keyframes bgBreath {
+  0%   { background-position:   0%  50%; }
+  25%  { background-position:  50%   0%; }
+  50%  { background-position: 100%  50%; }
+  75%  { background-position:  50% 100%; }
+  100% { background-position:   0%  50%; }
+}
+
+/* ================================================
+   Flores flotantes globales – MUY TENUES
+   ================================================ */
+.floral-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.floral-bg span {
+  position: absolute;
+  bottom: -100px;
+  display: block;
+  line-height: 1;
+  opacity: 0;
+  user-select: none;
+  animation: petalRise linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Posiciones, tamaños y tiempos escalonados */
+.floral-bg span:nth-child(1)  { left:  3%; font-size:2.8rem; animation-duration:18s; animation-delay:   0s; }
+.floral-bg span:nth-child(2)  { left:  9%; font-size:3.5rem; animation-duration:24s; animation-delay:  -4s; }
+.floral-bg span:nth-child(3)  { left: 16%; font-size:2.2rem; animation-duration:16s; animation-delay:  -8s; }
+.floral-bg span:nth-child(4)  { left: 23%; font-size:4.0rem; animation-duration:28s; animation-delay:  -2s; }
+.floral-bg span:nth-child(5)  { left: 30%; font-size:2.6rem; animation-duration:20s; animation-delay: -14s; }
+.floral-bg span:nth-child(6)  { left: 38%; font-size:2.0rem; animation-duration:15s; animation-delay:  -6s; }
+.floral-bg span:nth-child(7)  { left: 45%; font-size:4.2rem; animation-duration:30s; animation-delay: -10s; }
+.floral-bg span:nth-child(8)  { left: 53%; font-size:2.4rem; animation-duration:19s; animation-delay: -18s; }
+.floral-bg span:nth-child(9)  { left: 60%; font-size:3.2rem; animation-duration:25s; animation-delay: -12s; }
+.floral-bg span:nth-child(10) { left: 67%; font-size:2.8rem; animation-duration:21s; animation-delay:  -1s; }
+.floral-bg span:nth-child(11) { left: 74%; font-size:3.6rem; animation-duration:27s; animation-delay: -16s; }
+.floral-bg span:nth-child(12) { left: 81%; font-size:2.0rem; animation-duration:17s; animation-delay: -22s; }
+.floral-bg span:nth-child(13) { left:  6%; font-size:3.0rem; animation-duration:22s; animation-delay: -26s; }
+.floral-bg span:nth-child(14) { left: 34%; font-size:2.5rem; animation-duration:26s; animation-delay: -20s; }
+.floral-bg span:nth-child(15) { left: 57%; font-size:3.4rem; animation-duration:29s; animation-delay:  -9s; }
+.floral-bg span:nth-child(16) { left: 88%; font-size:2.2rem; animation-duration:23s; animation-delay: -24s; }
+
+@keyframes petalRise {
+  0% {
+    transform: translateY(0) translateX(0)    rotate(0deg)   scale(0.6);
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.30;   /* bien visible pero sin tapar contenido */
+  }
+  25%  { transform: translateY(-25vh) translateX(22px)  rotate(90deg)  scale(1.1); opacity: 0.28; }
+  50%  { transform: translateY(-50vh) translateX(-18px) rotate(195deg) scale(1.2); opacity: 0.25; }
+  75%  { transform: translateY(-75vh) translateX(25px)  rotate(275deg) scale(1.05); opacity: 0.22; }
+  94% {
+    opacity: 0.20;
+  }
+  100% {
+    transform: translateY(-108vh) translateX(-10px) rotate(360deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* ================================================
+   Todo el contenido SOBRE el fondo
+   ================================================ */
+.navbar,
+.main-content,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Login y register tienen su propio fondo vistoso;
+   ocultamos las flores globales para no duplicar */
+.login-container  .floral-bg,
+.register-container .floral-bg {
+  display: none;
+}
+
+/* ================================================
+   Scrollbar personalizada
+   ================================================ */
+::-webkit-scrollbar       { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-crema); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-rosa-primario);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-rosa-hover); }
