@@ -219,3 +219,39 @@ body {
     order: -1;
   }
 }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #5a4a3a;
+}
+
+/* Para imagen */
+.brand-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+/* Para emoji */
+.brand-icon {
+  font-size: 2rem;
+  display: inline-block;
+  animation: floatFlower 3s ease-in-out infinite;
+}
+
+/* Para SVG */
+.brand svg {
+  width: 40px;
+  height: 40px;
+  color: #e88383;
+  flex-shrink: 0;
+}
+
+@keyframes floatFlower {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(8deg); }
+}
