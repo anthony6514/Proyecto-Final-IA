@@ -5,6 +5,7 @@ import { ProductosService } from '../../../services/productos.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { AuthService } from '../../../services/auth.service';
 import { Producto, ProductoCarrito } from '../../../models/producto.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-catalogo',
@@ -37,21 +38,16 @@ export class Catalogo implements OnInit {
 
   aplicarFiltros(): void {
     let resultado = this.productos;
-
-    // Filtrar por categoría
     if (this.categoriaSeleccionada !== 'todos') {
       resultado = resultado.filter(p => p.categoria === this.categoriaSeleccionada);
     }
-
-    // Filtrar por búsqueda
     if (this.terminoBusqueda.trim()) {
       const termino = this.terminoBusqueda.toLowerCase();
-      resultado = resultado.filter(p => 
+      resultado = resultado.filter(p =>
         p.nombre.toLowerCase().includes(termino) ||
         p.descripcion.toLowerCase().includes(termino)
       );
     }
-
     this.productosFiltrados = resultado;
   }
 
@@ -66,74 +62,72 @@ export class Catalogo implements OnInit {
 
   agregarAlCarrito(producto: Producto): void {
     if (producto.stock === 0) {
-      alert('Producto sin stock disponible');
+      Swal.fire({
+        title: 'Sin stock',
+        text: 'Este producto no está disponible por el momento',
+        icon: 'warning',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#e57399',
+        customClass: { popup: 'swal-floral' }
+      });
       return;
     }
-
-    const productoCarrito: ProductoCarrito = {
-      ...producto,
-      cantidad: 1
-    };
-
+    const productoCarrito: ProductoCarrito = { ...producto, cantidad: 1 };
     this.carritoService.addProducto(productoCarrito);
-    
-    // Mostrar notificación temporal
     this.mostrarNotificacion(`${producto.nombre} añadido al carrito`);
   }
 
   mostrarNotificacion(mensaje: string): void {
-    // Crear elemento de notificación
-    const notif = document.createElement('div');
-    notif.className = 'notification-toast';
-    notif.textContent = mensaje;
-    document.body.appendChild(notif);
-
-    setTimeout(() => notif.classList.add('show'), 10);
-    setTimeout(() => {
-      notif.classList.remove('show');
-      setTimeout(() => document.body.removeChild(notif), 300);
-    }, 2000);
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 2200,
+      timerProgressBar: true,
+      customClass: { popup: 'swal-toast-floral' }
+    });
+    Toast.fire({ icon: 'success', title: mensaje });
   }
 
   editarProducto(producto: Producto): void {
-    // Esta función se implementará en el componente admin
     console.log('Editar producto:', producto);
   }
 
   eliminarProducto(producto: Producto): void {
-    if (confirm(`¿Estás seguro de eliminar "${producto.nombre}"?`)) {
-      this.productosService.deleteProducto(producto.id);
-      this.cargarProductos();
-      this.mostrarNotificacion('Producto eliminado');
-    }
+    Swal.fire({
+      title: '¿Eliminar producto?',
+      html: `Se eliminará <strong>${producto.nombre}</strong> permanentemente`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+      customClass: { popup: 'swal-floral' }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.productosService.deleteProducto(producto.id);
+        this.cargarProductos();
+        this.mostrarNotificacion('Producto eliminado');
+      }
+    });
   }
 
   getCategoriaLabel(categoria: string): string {
     const labels: { [key: string]: string } = {
-      'todos': 'Todos',
-      'rosas': 'Rosas',
-      'tulipanes': 'Tulipanes',
-      'girasoles': 'Girasoles',
-      'orquideas': 'Orquídeas',
-      'lirios': 'Lirios',
-      'otros': 'Otros'
+      'todos': 'Todos', 'rosas': 'Rosas', 'tulipanes': 'Tulipanes',
+      'girasoles': 'Girasoles', 'orquideas': 'Orquídeas',
+      'lirios': 'Lirios', 'otros': 'Otros'
     };
     return labels[categoria] || categoria;
   }
 
   onImageError(event: any): void {
-    // Reemplazar con una imagen SVG de placeholder mejorada
     const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
       <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#f5f0ea;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#e8e3dc;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="400" height="300" fill="url(#bg)"/>
-        <text x="50%" y="40%" text-anchor="middle" font-size="80" fill="#d4cfc5" font-family="Arial, sans-serif">🌸</text>
-        <text x="50%" y="65%" text-anchor="middle" font-size="18" fill="#a89584" font-family="Arial, sans-serif" font-weight="500">Imagen no disponible</text>
+        <rect width="400" height="300" fill="#fce4ec"/>
+        <text x="50%" y="45%" text-anchor="middle" font-size="80" fill="#f8bbd0" font-family="Arial">✿</text>
+        <text x="50%" y="68%" text-anchor="middle" font-size="18" fill="#e57399" font-family="Arial">Imagen no disponible</text>
       </svg>
     `);
     event.target.src = placeholder;

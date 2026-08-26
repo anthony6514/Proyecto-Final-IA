@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductosService } from '../../../services/productos.service';
 import { Producto } from '../../../models/producto.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-productos-admin',
@@ -37,11 +38,17 @@ export class ProductosAdmin implements OnInit {
 
   crearProducto(): void {
     if (!this.validarFormulario()) return;
-
     this.productosService.createProducto(this.nuevoProducto);
     this.cargarProductos();
     this.limpiarFormulario();
-    alert('Producto creado exitosamente');
+    Swal.fire({
+      title: '¡Producto creado!',
+      icon: 'success',
+      confirmButtonColor: '#e57399',
+      timer: 1800,
+      showConfirmButton: false,
+      customClass: { popup: 'swal-floral' }
+    });
   }
 
   editarProducto(producto: Producto): void {
@@ -52,18 +59,36 @@ export class ProductosAdmin implements OnInit {
 
   guardarEdicion(): void {
     if (!this.productoEditando || !this.validarFormulario()) return;
-
     this.productosService.updateProducto(this.productoEditando.id, this.nuevoProducto);
     this.cargarProductos();
     this.cancelarEdicion();
-    alert('Producto actualizado exitosamente');
+    Swal.fire({
+      title: '¡Producto actualizado!',
+      icon: 'success',
+      confirmButtonColor: '#e57399',
+      timer: 1800,
+      showConfirmButton: false,
+      customClass: { popup: 'swal-floral' }
+    });
   }
 
   eliminarProducto(id: string): void {
-    if (confirm('¿Estás seguro de eliminar este producto?')) {
-      this.productosService.deleteProducto(id);
-      this.cargarProductos();
-    }
+    Swal.fire({
+      title: '¿Eliminar producto?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+      customClass: { popup: 'swal-floral' }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.productosService.deleteProducto(id);
+        this.cargarProductos();
+      }
+    });
   }
 
   cancelarEdicion(): void {
@@ -86,11 +111,11 @@ export class ProductosAdmin implements OnInit {
 
   validarFormulario(): boolean {
     if (!this.nuevoProducto.nombre.trim()) {
-      alert('El nombre es requerido');
+      Swal.fire({ title: 'Campo requerido', text: 'El nombre del producto es obligatorio', icon: 'warning', confirmButtonColor: '#e57399', customClass: { popup: 'swal-floral' } });
       return false;
     }
     if (this.nuevoProducto.precio <= 0) {
-      alert('El precio debe ser mayor a 0');
+      Swal.fire({ title: 'Precio inválido', text: 'El precio debe ser mayor a 0', icon: 'warning', confirmButtonColor: '#e57399', customClass: { popup: 'swal-floral' } });
       return false;
     }
     return true;

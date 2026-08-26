@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../services/order.service';
 import { Order, OrderStatus, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '../../../models/order.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-pedidos-admin',
@@ -71,28 +72,32 @@ export class PedidosAdmin implements OnInit {
   }
 
   updateOrderStatus(order: Order, newStatus: OrderStatus): void {
-    if (order.status === newStatus) {
-      return;
-    }
+    if (order.status === newStatus) return;
 
-    const confirmMessage = `¿Estás seguro de cambiar el estado del pedido a "${ORDER_STATUS_LABELS[newStatus]}"?`;
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-
-    this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
-      next: (updatedOrder) => {
-        const index = this.orders.findIndex(o => o.id === order.id);
-        if (index !== -1) {
-          this.orders[index] = updatedOrder;
+    Swal.fire({
+      title: '¿Cambiar estado?',
+      html: `El pedido pasará a <strong>${ORDER_STATUS_LABELS[newStatus]}</strong>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cambiar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+      customClass: { popup: 'swal-floral' }
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
+        next: (updatedOrder) => {
+          const index = this.orders.findIndex(o => o.id === order.id);
+          if (index !== -1) this.orders[index] = updatedOrder;
+          this.applyFilters();
+          const Toast = Swal.mixin({ toast: true, position: 'bottom-end', showConfirmButton: false, timer: 2000 });
+          Toast.fire({ icon: 'success', title: `Estado actualizado a ${ORDER_STATUS_LABELS[newStatus]}` });
+        },
+        error: () => {
+          this.errorMessage = 'Error al actualizar el estado del pedido.';
         }
-        this.applyFilters();
-        this.showSuccessMessage(`Estado actualizado a ${ORDER_STATUS_LABELS[newStatus]}`);
-      },
-      error: (error) => {
-        console.error('Error updating order status:', error);
-        this.errorMessage = 'Error al actualizar el estado del pedido.';
-      }
+      });
     });
   }
 

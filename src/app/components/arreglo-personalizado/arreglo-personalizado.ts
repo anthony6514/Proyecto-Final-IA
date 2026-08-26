@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
-import { 
-  ArregloPersonalizado, 
-  FlorSeleccionada, 
+import {
+  ArregloPersonalizado,
+  FlorSeleccionada,
   Extra,
-  CONTENEDORES, 
-  FLORES_DISPONIBLES, 
-  EXTRAS_DISPONIBLES 
+  CONTENEDORES,
+  FLORES_DISPONIBLES,
+  EXTRAS_DISPONIBLES
 } from '../../models/arreglo.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-arreglo-personalizado',
@@ -97,7 +98,14 @@ export class ArregloPersonalizadoComponent {
 
   agregarAlCarrito(): void {
     if (this.floresSeleccionadas.length === 0) {
-      alert('Debes seleccionar al menos un tipo de flor');
+      Swal.fire({
+        title: 'Faltan flores',
+        text: 'Debes seleccionar al menos un tipo de flor',
+        icon: 'warning',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#e57399',
+        customClass: { popup: 'swal-floral' }
+      });
       return;
     }
 
@@ -110,9 +118,17 @@ export class ArregloPersonalizadoComponent {
     };
 
     this.carritoService.addArregloPersonalizado(arreglo);
-    
-    alert('¡Arreglo personalizado añadido al carrito!');
-    this.router.navigate(['/carrito']);
+
+    Swal.fire({
+      title: '¡Arreglo añadido!',
+      text: 'Tu arreglo personalizado fue agregado al carrito',
+      icon: 'success',
+      confirmButtonText: 'Ver carrito',
+      confirmButtonColor: '#e57399',
+      customClass: { popup: 'swal-floral' }
+    }).then(() => {
+      this.router.navigate(['/carrito']);
+    });
   }
 
   reiniciar(): void {

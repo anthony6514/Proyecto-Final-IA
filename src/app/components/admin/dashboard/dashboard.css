@@ -22,19 +22,19 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
   margin-bottom: 60px;
 }
 
 .stat-card {
   background: linear-gradient(135deg, var(--color-blanco) 0%, var(--color-crema) 100%);
-  padding: 35px;
-  border-radius: 25px;
+  padding: 22px 24px;
+  border-radius: 18px;
   box-shadow: var(--sombra-media);
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 18px;
   border: 2px solid var(--color-borde-suave);
   transition: all 0.4s ease;
   position: relative;

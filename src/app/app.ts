@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { CarritoService } from './services/carrito.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-root',
@@ -18,9 +19,25 @@ export class App {
   ) {}
 
   logout(): void {
-    if (confirm('¿Cerrar sesión?')) {
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: 'Tu sesión será terminada',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+      customClass: {
+        popup: 'swal-floral',
+        confirmButton: 'swal-btn-confirm',
+        cancelButton: 'swal-btn-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }
