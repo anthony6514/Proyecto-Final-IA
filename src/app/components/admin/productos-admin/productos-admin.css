@@ -112,6 +112,7 @@ h1, h2 {
   height: 100px;
   object-fit: cover;
   border-radius: 8px;
+  background: linear-gradient(135deg, #f5f0ea 0%, #e8e3dc 100%);
 }
 
 .producto-data h3 {

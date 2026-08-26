@@ -28,7 +28,13 @@
 }
 
 .stat-icon {
-  font-size: 3rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .stat-info h3 {
@@ -67,9 +73,13 @@
 }
 
 .action-icon {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 15px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border-radius: 16px;
 }
 
 .action-card h3 {

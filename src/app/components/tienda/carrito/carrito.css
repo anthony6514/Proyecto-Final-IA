@@ -51,6 +51,7 @@
   height: 100px;
   object-fit: cover;
   border-radius: 6px;
+  background: linear-gradient(135deg, #f5f0ea 0%, #e8e3dc 100%);
 }
 
 .arreglo-icono {

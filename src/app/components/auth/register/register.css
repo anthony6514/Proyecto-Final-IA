@@ -3,18 +3,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: linear-gradient(135deg, #f5f0ea 0%, #e8e3dc 100%);
   padding: 20px;
 }
 
 .register-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(139, 115, 85, 0.2);
   padding: 40px;
   width: 100%;
   max-width: 450px;
   animation: slideUp 0.4s ease-out;
+  border: 1px solid #d4cfc5;
 }
 
 @keyframes slideUp {
@@ -35,12 +36,12 @@
 
 .register-header h1 {
   font-size: 2.5rem;
-  color: #764ba2;
+  color: #3a3530;
   margin: 0 0 10px 0;
 }
 
 .register-header p {
-  color: #666;
+  color: #7a6e5f;
   font-size: 1rem;
 }
 
@@ -58,22 +59,24 @@
 
 .form-group label {
   font-weight: 600;
-  color: #333;
+  color: #3a3530;
   font-size: 0.95rem;
 }
 
 .form-group input {
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #d4cfc5;
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
+  background: white;
+  color: #3a3530;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #764ba2;
-  box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+  border-color: #a89584;
+  box-shadow: 0 0 0 3px rgba(168, 149, 132, 0.1);
 }
 
 .error-message {
@@ -95,7 +98,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: linear-gradient(135deg, #a89584 0%, #8b7355 100%);
   color: white;
   border: none;
   padding: 14px;
@@ -113,7 +116,8 @@
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+  box-shadow: 0 10px 20px rgba(139, 115, 85, 0.3);
+  background: linear-gradient(135deg, #8b7355 0%, #6b5f52 100%);
 }
 
 .btn-primary:disabled {
@@ -142,18 +146,19 @@
 }
 
 .register-footer p {
-  color: #666;
+  color: #7a6e5f;
   font-size: 0.95rem;
 }
 
 .register-footer a {
-  color: #764ba2;
+  color: #a89584;
   text-decoration: none;
   font-weight: 600;
 }
 
 .register-footer a:hover {
   text-decoration: underline;
+  color: #8b7355;
 }
 
 @media (max-width: 768px) {
