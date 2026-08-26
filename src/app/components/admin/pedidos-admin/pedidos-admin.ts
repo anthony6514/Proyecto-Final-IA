@@ -84,7 +84,7 @@ export class PedidosAdmin implements OnInit {
       confirmButtonColor: '#e57399',
       cancelButtonColor: '#ab6fc8',
       customClass: { popup: 'swal-floral' }
-    }).then((result) => {
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
       if (!result.isConfirmed) return;
       this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
         next: (updatedOrder) => {

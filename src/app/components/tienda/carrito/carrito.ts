@@ -33,7 +33,7 @@ export class Carrito {
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#e57399',
       cancelButtonColor: '#ab6fc8',
-    }).then((result) => {
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
       if (result.isConfirmed) {
         this.carritoService.removeProducto(id);
       }
@@ -50,7 +50,7 @@ export class Carrito {
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#e57399',
       cancelButtonColor: '#ab6fc8',
-    }).then((result) => {
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
       if (result.isConfirmed) {
         this.carritoService.removeArregloPersonalizado(id);
       }
@@ -67,7 +67,7 @@ export class Carrito {
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#e57399',
       cancelButtonColor: '#ab6fc8',
-    }).then((result) => {
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
       if (result.isConfirmed) {
         this.carritoService.clearCarrito();
         Swal.fire({

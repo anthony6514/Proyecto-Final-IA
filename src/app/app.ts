@@ -33,7 +33,7 @@ export class App {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
       }
-    }).then((result) => {
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
       if (result.isConfirmed) {
         this.authService.logout();
         this.router.navigate(['/login']);
