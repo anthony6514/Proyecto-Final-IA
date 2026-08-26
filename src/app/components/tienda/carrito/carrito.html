@@ -11,7 +11,11 @@
       <div class="items-lista">
         @for (item of carritoService.items(); track item.id) {
           <div class="carrito-item">
-            <img [src]="item.imagen" [alt]="item.nombre" />
+            <img 
+              [src]="item.imagen" 
+              [alt]="item.nombre"
+              (error)="onImageError($event)"
+            />
             <div class="item-info">
               <h3>{{ item.nombre }}</h3>
               <p class="item-precio">${{ item.precio.toFixed(2) }}</p>

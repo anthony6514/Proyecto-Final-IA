@@ -38,7 +38,13 @@
     @for (producto of productosFiltrados; track producto.id) {
       <div class="producto-card">
         <div class="producto-imagen">
-          <img [src]="producto.imagen" [alt]="producto.nombre" />
+          <img 
+            [src]="producto.imagen" 
+            [alt]="producto.nombre"
+            (error)="onImageError($event)"
+            loading="lazy"
+            crossorigin="anonymous"
+          />
           @if (producto.stock === 0) {
             <div class="badge-sin-stock">Sin stock</div>
           }

@@ -95,4 +95,22 @@ export class ProductosAdmin implements OnInit {
     }
     return true;
   }
+
+  onImageError(event: any): void {
+    // Reemplazar con una imagen SVG de placeholder mejorada
+    const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#f5f0ea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#e8e3dc;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="100" height="100" fill="url(#bg)"/>
+        <text x="50%" y="60%" text-anchor="middle" font-size="40" fill="#d4cfc5" font-family="Arial, sans-serif">🌸</text>
+      </svg>
+    `);
+    event.target.src = placeholder;
+    event.target.style.objectFit = 'contain';
+  }
 }

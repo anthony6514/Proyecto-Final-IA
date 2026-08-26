@@ -68,7 +68,11 @@
       @for (producto of productos; track producto.id) {
         <div class="producto-row">
           <div class="producto-img">
-            <img [src]="producto.imagen" [alt]="producto.nombre" />
+            <img 
+              [src]="producto.imagen" 
+              [alt]="producto.nombre"
+              (error)="onImageError($event)"
+            />
           </div>
           <div class="producto-data">
             <h3>{{ producto.nombre }}</h3>

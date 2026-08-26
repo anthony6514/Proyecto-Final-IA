@@ -45,5 +45,10 @@ export const routes: Routes = [
 		loadComponent: () => import('./components/admin/productos-admin/productos-admin').then(({ ProductosAdmin }) => ProductosAdmin),
 		canActivate: [adminGuard]
 	},
+	{
+		path: 'admin/pedidos',
+		loadComponent: () => import('./components/admin/pedidos-admin/pedidos-admin').then(({ PedidosAdmin }) => PedidosAdmin),
+		canActivate: [adminGuard]
+	},
 	{ path: '**', redirectTo: '' }
 ];
