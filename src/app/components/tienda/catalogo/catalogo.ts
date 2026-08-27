@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';  // ✅ Agregar Router
 import { ProductosService } from '../../../services/productos.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { AuthService } from '../../../services/auth.service';
@@ -18,32 +19,35 @@ export class Catalogo implements OnInit {
   categoriaSeleccionada = 'todos';
   terminoBusqueda = '';
   categorias: string[] = [];
+  loading = true;
 
   constructor(
     public productosService: ProductosService,
     private carritoService: CarritoService,
-    public authService: AuthService
+    public authService: AuthService,
+    private router: Router  // ✅ Inyectar Router
   ) {}
 
-  ngOnInit(): void {
-    this.cargarProductos();
-    this.categorias = this.productosService.getCategorias();
+  async ngOnInit(): Promise<void> {
+    await this.cargarProductos();
   }
 
-  cargarProductos(): void {
+  async cargarProductos(): Promise<void> {
+    this.loading = true;
+    await this.productosService.cargarProductos();
     this.productos = this.productosService.getProductos();
+    this.categorias = this.productosService.getCategorias();
     this.aplicarFiltros();
+    this.loading = false;
   }
 
   aplicarFiltros(): void {
     let resultado = this.productos;
 
-    // Filtrar por categoría
     if (this.categoriaSeleccionada !== 'todos') {
       resultado = resultado.filter(p => p.categoria === this.categoriaSeleccionada);
     }
 
-    // Filtrar por búsqueda
     if (this.terminoBusqueda.trim()) {
       const termino = this.terminoBusqueda.toLowerCase();
       resultado = resultado.filter(p => 
@@ -64,9 +68,15 @@ export class Catalogo implements OnInit {
     this.aplicarFiltros();
   }
 
-  agregarAlCarrito(producto: Producto): void {
+  async agregarAlCarrito(producto: Producto): Promise<void> {
     if (producto.stock === 0) {
       alert('Producto sin stock disponible');
+      return;
+    }
+
+    if (!this.authService.isAuthenticated()) {
+      alert('Por favor, inicia sesión para agregar productos al carrito');
+      this.router.navigate(['/login']);  // ✅ Redirigir al login
       return;
     }
 
@@ -75,14 +85,11 @@ export class Catalogo implements OnInit {
       cantidad: 1
     };
 
-    this.carritoService.addProducto(productoCarrito);
-    
-    // Mostrar notificación temporal
+    await this.carritoService.addProducto(productoCarrito);  // ✅ Usar await
     this.mostrarNotificacion(`${producto.nombre} añadido al carrito`);
   }
 
   mostrarNotificacion(mensaje: string): void {
-    // Crear elemento de notificación
     const notif = document.createElement('div');
     notif.className = 'notification-toast';
     notif.textContent = mensaje;
@@ -96,14 +103,13 @@ export class Catalogo implements OnInit {
   }
 
   editarProducto(producto: Producto): void {
-    // Esta función se implementará en el componente admin
     console.log('Editar producto:', producto);
   }
 
-  eliminarProducto(producto: Producto): void {
+  async eliminarProducto(producto: Producto): Promise<void> {
     if (confirm(`¿Estás seguro de eliminar "${producto.nombre}"?`)) {
-      this.productosService.deleteProducto(producto.id);
-      this.cargarProductos();
+      await this.productosService.deleteProducto(producto.id);
+      await this.cargarProductos();
       this.mostrarNotificacion('Producto eliminado');
     }
   }
@@ -122,7 +128,6 @@ export class Catalogo implements OnInit {
   }
 
   onImageError(event: any): void {
-    // Reemplazar con una imagen SVG de placeholder mejorada
     const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
       <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
         <defs>
