@@ -1,55 +1,118 @@
 <div class="chat-page">
   <div class="chat-container">
+    <!-- HEADER -->
     <div class="chat-header">
-      <div class="bot-avatar">BOT</div>
+      <div class="bot-avatar">
+        <span class="material-symbols-outlined">local_florist</span>
+      </div>
       <div class="bot-info">
-        <h3>Asistente Virtual</h3>
+        <h3>FlorerIA</h3>
         <span class="status">En línea</span>
       </div>
+      <div class="header-actions">
+        <!-- 👈 BOTÓN DE RECARGA (DISCRETO) -->
+        <button (click)="refreshChat()" class="refresh-btn" title="Actualizar chat">
+          <span class="material-symbols-outlined">sync</span>
+        </button>
+        <button (click)="toggleVoice()" class="icon-btn" [class.active]="voiceEnabled">
+          <span class="material-symbols-outlined">{{ voiceEnabled ? 'volume_up' : 'volume_off' }}</span>
+        </button>
+        <button (click)="trackOrder()" class="icon-btn">
+          <span class="material-symbols-outlined">track_changes</span>
+        </button>
+        <button (click)="clearChat()" class="icon-btn">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </div>
     </div>
 
-    <div class="chat-messages">
-      <div *ngFor="let message of messages" 
-           [class]="message.isBot ? 'message bot-message' : 'message user-message'">
-        <div class="message-avatar" *ngIf="message.isBot">BOT</div>
-        <div class="message-content">
-          <p [innerHTML]="message.text"></p>
-          <span class="message-time">{{ getTimeString(message.timestamp) }}</span>
+    <!-- MESSAGES -->
+    <div class="chat-messages" #messageContainer>
+      <div *ngFor="let msg of messages; let i = index" 
+           class="message"
+           [class.bot-message]="msg.isBot"
+           [class.user-message]="!msg.isBot">
+        
+        <div class="message-avatar" *ngIf="msg.isBot">
+          <span class="material-symbols-outlined">local_florist</span>
         </div>
-        <div class="message-avatar" *ngIf="!message.isBot">TU</div>
+        
+        <div class="message-content">
+          <div class="message-bubble">
+            <p [innerHTML]="formatMessage(msg.text)"></p>
+          </div>
+          <span class="message-time">{{ getTimeString(msg.timestamp) }}</span>
+        </div>
+        
+        <div class="message-avatar" *ngIf="!msg.isBot">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="message bot-message">
+        <div class="message-avatar">
+          <span class="material-symbols-outlined">local_florist</span>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="chat-input-container">
-      <div class="input-buttons">
-        <button class="input-btn" (click)="sendImage()" title="Enviar imagen">
-          <span>Foto</span>
+    <!-- CONFIRMACIÓN -->
+    <div *ngIf="showConfirmationForm" class="confirmation-panel">
+      <div class="confirmation-header">
+        <span class="material-symbols-outlined" style="font-size: 24px; color: #e91e63;">celebration</span>
+        <h4>Confirmar Pedido</h4>
+      </div>
+      <p class="confirmation-text">Completa tus datos de envío:</p>
+      <div class="customer-form">
+        <input type="text" [(ngModel)]="customerData.nombre" placeholder="Nombre completo *" class="form-input">
+        <input type="email" [(ngModel)]="customerData.email" placeholder="Correo electrónico *" class="form-input">
+        <input type="text" [(ngModel)]="customerData.direccion" placeholder="Dirección de envío *" class="form-input">
+        <input type="text" [(ngModel)]="customerData.ciudad" placeholder="Ciudad *" class="form-input">
+        <input type="tel" [(ngModel)]="customerData.telefono" placeholder="Teléfono" class="form-input">
+      </div>
+      <div class="confirmation-buttons">
+        <button (click)="confirmOrder()" class="confirm-btn" [disabled]="!customerData.nombre || !customerData.email || !customerData.direccion">
+          <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span> Confirmar
         </button>
-        <button 
-          class="input-btn" 
-          [class.active]="isRecording"
-          (click)="sendAudio()" 
-          title="Enviar audio">
-          <span>Voz</span>
+        <button (click)="cancelOrder()" class="cancel-btn">
+          <span class="material-symbols-outlined" style="font-size: 18px;">cancel</span> Cancelar
         </button>
       </div>
-      <input 
-        type="text" 
-        [(ngModel)]="userInput"
-        (keyup.enter)="sendMessage()"
-        placeholder="Escribe tu mensaje..."
-        autocomplete="off"
-      >
-      <button class="send-btn" (click)="sendMessage()">
-        <span>Enviar</span>
+    </div>
+
+    <!-- QUICK REPLIES -->
+    <div class="quick-replies">
+      <button class="quick-reply" (click)="sendQuickReply('Ver catálogo')">
+        <span class="material-symbols-outlined">inventory_2</span> Ver catálogo
+      </button>
+      <button class="quick-reply" (click)="sendQuickReply('Quiero hacer un pedido')">
+        <span class="material-symbols-outlined">shopping_cart</span> Hacer pedido
+      </button>
+      <button class="quick-reply" (click)="sendQuickReply('Precios')">
+        <span class="material-symbols-outlined">payments</span> Precios
+      </button>
+      <button class="quick-reply" (click)="sendQuickReply('Ayuda')">
+        <span class="material-symbols-outlined">help</span> Ayuda
       </button>
     </div>
 
-    <div class="quick-replies">
-      <button class="quick-reply" (click)="sendQuickReply('Hola')">Hola</button>
-      <button class="quick-reply" (click)="sendQuickReply('¿Qué flores tienes?')">Ver flores</button>
-      <button class="quick-reply" (click)="sendQuickReply('Precio')">Precios</button>
-      <button class="quick-reply" (click)="sendQuickReply('Ayuda')">Ayuda</button>
+    <!-- INPUT -->
+    <div class="chat-input-container">
+      <input type="text" 
+             [(ngModel)]="userInput" 
+             (keyup.enter)="sendMessage()" 
+             [disabled]="isLoading" 
+             placeholder="🌸 Escribe tu mensaje...">
+      <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">
+        <span class="material-symbols-outlined">send</span> Enviar
+      </button>
     </div>
   </div>
 </div>

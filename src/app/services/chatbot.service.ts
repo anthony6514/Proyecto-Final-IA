@@ -1,50 +1,148 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 export interface Message {
   text: string;
   isBot: boolean;
   timestamp: Date;
-  type?: 'text' | 'image' | 'audio';
+  type: 'text' | 'image' | 'audio';
+}
+
+export interface ChatRequest {
+  message: string;
+  userId: string;
+  history?: any[];
+}
+
+export interface ChatResponse {
+  response: string;
+  needsConfirmation: boolean;
+  needsCustomerData: boolean;
+  isOrderQuery: boolean;
+  history: any[];
+}
+
+export interface OrderConfirmationRequest {
+  response: string;
+  userId: string;
+  customerData?: {
+    nombre?: string;
+    email?: string;
+    telefono?: string;
+    direccion?: string;
+    ciudad?: string;
+  };
+  items?: any[];
+  total?: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatbotService {
-  private responses: { [key: string]: string } = {
-    'hola': 'Hola. Bienvenido a Flores Chat. ¿Buscas un ramo, un detalle o flores para un evento?',
-    'que flores tienes': 'Esta semana trabajamos con rosas de jardín, peonías, tulipanes y eucalipto. ¿Qué estilo prefieres?',
-    'precio': 'Nuestros ramos comienzan en $15. Una composición mediana cuesta $28 y una especial para evento se cotiza según la temporada.',
-    'ayuda': 'Puedo ayudarte a elegir flores, consultar precios, recomendar un ramo o preparar un pedido.',
-    'rosa': 'Las rosas de jardín son aromáticas y elegantes. Ideales para aniversarios y regalos con intención.',
-    'girasol': 'El girasol aporta luz y carácter. Podemos combinarlo con verdes suaves para un arreglo más sobrio.',
-    'tulipan': 'El tulipán tiene una silueta limpia y contemporánea. Es una opción elegante para regalar.',
-    'peonia': 'La peonía es delicada y abundante. Está disponible durante su temporada y funciona muy bien sola.',
-    'adios': 'Gracias por visitar Flores Chat. Que tengas un buen día.',
-    'gracias': 'Con gusto. ¿Quieres que te recomiende una composición?',
-    'default': 'Puedo ayudarte con flores disponibles, precios, recomendaciones o pedidos.'
-  };
+  private apiUrl = 'http://localhost:8080/api/assistant';
+  private conversationHistory: any[] = [];
+  private userId: string = '';
 
-  constructor() {}
+  constructor(private http: HttpClient) {
+    // Obtener userId del localStorage (o del servicio de autenticación)
+    this.userId = localStorage.getItem('userId') || '';
+  }
 
-  getResponse(userMessage: string): string {
-    const message = userMessage.toLowerCase().trim();
-    
-    // Buscar coincidencias
-    for (const key in this.responses) {
-      if (message.includes(key)) {
-        return this.responses[key];
-      }
+  /**
+   * Enviar mensaje al chatbot real
+   */
+  async sendMessage(message: string): Promise<string> {
+    try {
+      const request: ChatRequest = {
+        message: message,
+        userId: this.userId,
+        history: this.conversationHistory
+      };
+
+      const response = await firstValueFrom(
+        this.http.post<ChatResponse>(`${this.apiUrl}/chat`, request)
+      );
+
+      // Actualizar historial
+      this.conversationHistory = response.history || [];
+
+      return response.response;
+    } catch (error) {
+      console.error('Error en el chat:', error);
+      return '❌ Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.';
     }
-    
-    return this.responses['default'];
+  }
+
+  /**
+   * Confirmar pedido
+   */
+  async confirmOrder(response: string, customerData: any): Promise<string> {
+    try {
+      const request: OrderConfirmationRequest = {
+        response: response,
+        userId: this.userId,
+        customerData: customerData
+      };
+
+      const result = await firstValueFrom(
+        this.http.post<any>(`${this.apiUrl}/confirm`, request)
+      );
+
+      return result.mensaje || '✅ Pedido confirmado correctamente';
+    } catch (error) {
+      console.error('Error confirmando pedido:', error);
+      return '❌ Hubo un error al confirmar tu pedido. Por favor, intenta de nuevo.';
+    }
+  }
+
+  /**
+   * Buscar pedido por código
+   */
+  async trackOrder(codigo: string): Promise<string> {
+    try {
+      const result = await firstValueFrom(
+        this.http.get<any>(`${this.apiUrl}/track/${codigo}`)
+      );
+      return result.mensaje || 'No se encontró el pedido';
+    } catch (error) {
+      console.error('Error buscando pedido:', error);
+      return '❌ Hubo un error al buscar tu pedido.';
+    }
+  }
+
+  /**
+   * Limpiar historial de conversación
+   */
+  clearHistory() {
+    this.conversationHistory = [];
+  }
+
+  /**
+   * Establecer el userId (para cuando el usuario inicia sesión)
+   */
+  setUserId(userId: string) {
+    this.userId = userId;
+    localStorage.setItem('userId', userId);
+  }
+
+  // ===== MÉTODOS LEGACY (para compatibilidad con tu componente existente) =====
+
+  /**
+   * Obtener respuesta (versión simplificada para el componente actual)
+   */
+  getResponse(message: string): string {
+    // Este método se mantiene por compatibilidad, pero usamos sendMessage() en su lugar
+    return '🌸 Procesando tu mensaje...';
   }
 
   processImageMessage(): string {
-    return 'Imagen recibida. Puedo ayudarte a identificar el estilo del arreglo o recomendarte una composición parecida.';
+    return '📷 He recibido tu imagen. ¿Qué flores te gustaría ver? 🌸';
   }
 
   processAudioMessage(): string {
-    return 'Audio recibido. Cuéntame para quién es el arreglo y qué ocasión quieres acompañar.';
+    return '🎤 He recibido tu audio. ¿Cómo puedo ayudarte con tus flores? 🌷';
   }
 }
