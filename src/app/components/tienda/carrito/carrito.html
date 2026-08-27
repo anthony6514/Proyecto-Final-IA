@@ -57,8 +57,16 @@
           <span>Total:</span>
           <span>${{ carritoService.precioTotal().toFixed(2) }}</span>
         </div>
-        <button (click)="procesarCompra()" class="btn-primary btn-comprar">
-          Procesar Compra
+        <button 
+          (click)="procesarCompra()" 
+          class="btn-primary btn-comprar"
+          [disabled]="procesando"
+        >
+          @if (procesando) {
+            ⏳ Procesando...
+          } @else {
+            Procesar Compra
+          }
         </button>
         <button (click)="vaciarCarrito()" class="btn-vaciar">
           Vaciar Carrito

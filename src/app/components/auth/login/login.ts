@@ -25,7 +25,7 @@ export class Login {
     private router: Router
   ) {}
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (!this.credentials.email || !this.credentials.password) {
       this.errorMessage = 'Por favor completa todos los campos';
       return;
@@ -34,12 +34,10 @@ export class Login {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Simulamos un pequeño delay para parecer más real
-    setTimeout(() => {
-      const result = this.authService.login(this.credentials);
+    try {
+      const result = await this.authService.login(this.credentials);
       
       if (result.success) {
-        // Redirigir según el rol
         if (result.user?.rol === 'admin') {
           this.router.navigate(['/admin']);
         } else {
@@ -48,9 +46,11 @@ export class Login {
       } else {
         this.errorMessage = result.message;
       }
-      
+    } catch (error) {
+      this.errorMessage = 'Error al iniciar sesión';
+    } finally {
       this.isLoading = false;
-    }, 500);
+    }
   }
 
   clearError(): void {
