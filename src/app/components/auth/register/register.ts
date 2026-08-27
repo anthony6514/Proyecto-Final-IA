@@ -28,7 +28,8 @@ export class Register {
     private router: Router
   ) {}
 
-  onSubmit(): void {
+  // ✅ CAMBIADO: Ahora es async/await
+  async onSubmit(): Promise<void> {
     // Validaciones
     if (!this.registerData.nombre || !this.registerData.email || !this.registerData.password) {
       this.errorMessage = 'Por favor completa todos los campos';
@@ -47,10 +48,11 @@ export class Register {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
-    // Simulamos un pequeño delay
-    setTimeout(() => {
-      const result = this.authService.register(this.registerData);
+    try {
+      // ✅ CAMBIADO: Usar await en lugar de setTimeout
+      const result = await this.authService.register(this.registerData);
       
       if (result.success) {
         this.successMessage = result.message;
@@ -60,9 +62,12 @@ export class Register {
       } else {
         this.errorMessage = result.message;
       }
-      
+    } catch (error) {
+      console.error('Error en registro:', error);
+      this.errorMessage = 'Error al registrar usuario. Intenta de nuevo.';
+    } finally {
       this.isLoading = false;
-    }, 500);
+    }
   }
 
   clearMessages(): void {
