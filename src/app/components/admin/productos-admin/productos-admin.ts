@@ -14,6 +14,7 @@ export class ProductosAdmin implements OnInit {
   productos: Producto[] = [];
   modoEdicion = false;
   productoEditando: Producto | null = null;
+  loading = true;  // 🔥 NUEVO: Estado de carga
   
   nuevoProducto: Omit<Producto, 'id'> = {
     nombre: '',
@@ -27,21 +28,29 @@ export class ProductosAdmin implements OnInit {
 
   constructor(private productosService: ProductosService) {}
 
-  ngOnInit(): void {
-    this.cargarProductos();
+  async ngOnInit(): Promise<void> {
+    await this.cargarProductos();
   }
 
-  cargarProductos(): void {
+  async cargarProductos(): Promise<void> {
+    this.loading = true;
+    await this.productosService.cargarProductos();  // 🔥 NUEVO: Cargar desde Firebase
     this.productos = this.productosService.getProductos();
+    this.loading = false;
   }
 
-  crearProducto(): void {
+  async crearProducto(): Promise<void> {
     if (!this.validarFormulario()) return;
 
-    this.productosService.createProducto(this.nuevoProducto);
-    this.cargarProductos();
-    this.limpiarFormulario();
-    alert('Producto creado exitosamente');
+    try {
+      await this.productosService.createProducto(this.nuevoProducto);
+      await this.cargarProductos();
+      this.limpiarFormulario();
+      alert('Producto creado exitosamente');
+    } catch (error) {
+      alert('Error al crear el producto');
+      console.error(error);
+    }
   }
 
   editarProducto(producto: Producto): void {
@@ -50,19 +59,30 @@ export class ProductosAdmin implements OnInit {
     this.nuevoProducto = { ...producto };
   }
 
-  guardarEdicion(): void {
+  async guardarEdicion(): Promise<void> {
     if (!this.productoEditando || !this.validarFormulario()) return;
 
-    this.productosService.updateProducto(this.productoEditando.id, this.nuevoProducto);
-    this.cargarProductos();
-    this.cancelarEdicion();
-    alert('Producto actualizado exitosamente');
+    try {
+      await this.productosService.updateProducto(this.productoEditando.id, this.nuevoProducto);
+      await this.cargarProductos();
+      this.cancelarEdicion();
+      alert('Producto actualizado exitosamente');
+    } catch (error) {
+      alert('Error al actualizar el producto');
+      console.error(error);
+    }
   }
 
-  eliminarProducto(id: string): void {
+  async eliminarProducto(id: string): Promise<void> {
     if (confirm('¿Estás seguro de eliminar este producto?')) {
-      this.productosService.deleteProducto(id);
-      this.cargarProductos();
+      try {
+        await this.productosService.deleteProducto(id);
+        await this.cargarProductos();
+        alert('Producto eliminado exitosamente');
+      } catch (error) {
+        alert('Error al eliminar el producto');
+        console.error(error);
+      }
     }
   }
 
@@ -97,7 +117,6 @@ export class ProductosAdmin implements OnInit {
   }
 
   onImageError(event: any): void {
-    // Reemplazar con una imagen SVG de placeholder mejorada
     const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
         <defs>

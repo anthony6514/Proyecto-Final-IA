@@ -30,24 +30,23 @@ export class PedidosAdmin implements OnInit {
     this.loadOrders();
   }
 
-  loadOrders(): void {
+  // ✅ CORREGIDO: Cambiar a async/await
+  async loadOrders(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
     
-    this.orderService.getAllOrders().subscribe({
-      next: (orders) => {
-        this.orders = orders.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading orders:', error);
-        this.errorMessage = 'Error al cargar los pedidos. Por favor, intenta de nuevo.';
-        this.isLoading = false;
-      }
-    });
+    try {
+      const orders = await this.orderService.getAllOrders();
+      this.orders = orders.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      this.applyFilters();
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      this.errorMessage = 'Error al cargar los pedidos. Por favor, intenta de nuevo.';
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   applyFilters(): void {
@@ -70,7 +69,8 @@ export class PedidosAdmin implements OnInit {
     this.applyFilters();
   }
 
-  updateOrderStatus(order: Order, newStatus: OrderStatus): void {
+  // ✅ CORREGIDO: Cambiar a async/await
+  async updateOrderStatus(order: Order, newStatus: OrderStatus): Promise<void> {
     if (order.status === newStatus) {
       return;
     }
@@ -80,20 +80,20 @@ export class PedidosAdmin implements OnInit {
       return;
     }
 
-    this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
-      next: (updatedOrder) => {
+    try {
+      const updatedOrder = await this.orderService.updateOrderStatus(order.id, newStatus);
+      if (updatedOrder) {
         const index = this.orders.findIndex(o => o.id === order.id);
         if (index !== -1) {
           this.orders[index] = updatedOrder;
         }
         this.applyFilters();
         this.showSuccessMessage(`Estado actualizado a ${ORDER_STATUS_LABELS[newStatus]}`);
-      },
-      error: (error) => {
-        console.error('Error updating order status:', error);
-        this.errorMessage = 'Error al actualizar el estado del pedido.';
       }
-    });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      this.errorMessage = 'Error al actualizar el estado del pedido.';
+    }
   }
 
   viewOrderDetails(order: Order): void {
