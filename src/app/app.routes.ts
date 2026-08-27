@@ -32,7 +32,7 @@ export const routes: Routes = [
 	},
 	{
 		path: 'chat',
-		loadComponent: () => import('./components/chat/chat').then(({ Chat }) => Chat),
+		loadComponent: () => import('./components/chat/chat').then(({ ChatComponent }) => ChatComponent),
 		canActivate: [authGuard]
 	},
 	{

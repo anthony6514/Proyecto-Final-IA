@@ -11,7 +11,10 @@ import Swal from 'sweetalert2';
   styleUrl: './carrito.css'
 })
 export class Carrito {
-  procesando = false;
+  // Propiedad para controlar el estado de procesamiento
+  procesando: boolean = false;
+
+  constructor(public carritoService: CarritoService) {}
 
   constructor(
     public carritoService: CarritoService,
@@ -87,16 +90,41 @@ export class Carrito {
     });
   }
 
-  procesarCompra(): void {
-    Swal.fire({
-      title: '¡Gracias por tu compra!',
-      text: 'Tu pedido ha sido recibido con éxito',
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#e57399',
-      customClass: { popup: 'swal-floral' }
-    });
-    this.carritoService.clearCarrito();
+  // Método procesarCompra actualizado con manejo de estado
+  async procesarCompra(): Promise<void> {
+    // Activar estado de procesamiento
+    this.procesando = true;
+    
+    try {
+      // Simular proceso de compra (aquí iría tu llamada a API real)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Mostrar mensaje de éxito
+      await Swal.fire({
+        title: '¡Gracias por tu compra!',
+        text: 'Tu pedido ha sido recibido con éxito',
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#e57399',
+        customClass: { popup: 'swal-floral' }
+      });
+      
+      // Vaciar el carrito después de la compra exitosa
+      this.carritoService.clearCarrito();
+      
+    } catch (error) {
+      // Manejar errores
+      await Swal.fire({
+        title: 'Error al procesar la compra',
+        text: 'Hubo un problema al procesar tu pedido. Por favor, intenta nuevamente.',
+        icon: 'error',
+        confirmButtonText: 'Intentar de nuevo',
+        confirmButtonColor: '#e57399'
+      });
+    } finally {
+      // Desactivar estado de procesamiento siempre
+      this.procesando = false;
+    }
   }
   // carrito.ts - procesarCompra
 async procesarCompra(): Promise<void> {
