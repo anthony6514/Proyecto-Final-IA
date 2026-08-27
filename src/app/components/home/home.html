@@ -1,41 +1,68 @@
 <div class="home-welcome">
+
   <div class="welcome-hero">
-    <h1>Bienvenido a FlorerIA</h1>
+    <h1>Bienvenido a <span class="brand-highlight">FlorerIA</span></h1>
     <p class="subtitle">Tu sistema completo de gestión de floristería</p>
   </div>
 
   <div class="features-grid">
-    <a routerLink="/tienda" class="feature-card">
-      <span class="feature-icon">Tienda</span>
-      <h3>Catálogo</h3>
-      <p>Explora nuestro catálogo completo de flores y arreglos</p>
+
+    <a routerLink="/tienda" class="feature-card card-tienda">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <span class="card-label">Explorar</span>
+      <h3>Tienda</h3>
+      <p>Catálogo completo de flores y arreglos frescos</p>
     </a>
 
-    <a routerLink="/arreglo-personalizado" class="feature-card">
-      <span class="feature-icon">Diseño</span>
+    <a routerLink="/arreglo-personalizado" class="feature-card card-arreglo">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a5 5 0 015 5c0 3-2 5.5-5 8-3-2.5-5-5-5-8a5 5 0 015-5z"/>
+          <path d="M12 15v7M8 19h8"/>
+        </svg>
+      </div>
+      <span class="card-label">Diseñar</span>
       <h3>Crear Arreglo</h3>
-      <p>Diseña tu arreglo floral personalizado</p>
+      <p>Diseña tu arreglo floral único a tu gusto</p>
     </a>
 
-    <a routerLink="/chat" class="feature-card">
-      <span class="feature-icon">Asistente</span>
-      <h3>Chatbot</h3>
-      <p>Obtén recomendaciones y ayuda personalizada</p>
+    <a routerLink="/chat" class="feature-card card-chat">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      </div>
+      <span class="card-label">Consultar</span>
+      <h3>Asistente IA</h3>
+      <p>Recomendaciones personalizadas con inteligencia artificial</p>
     </a>
 
-    <a routerLink="/carrito" class="feature-card">
-      <span class="feature-icon">Carrito</span>
-      <h3>Mis Pedidos</h3>
-      <p>Revisa tus productos seleccionados</p>
+    <a routerLink="/carrito" class="feature-card card-carrito">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+        </svg>
+      </div>
+      <span class="card-label">Revisar</span>
+      <h3>Mi Carrito</h3>
+      <p>Gestiona tus flores y arreglos seleccionados</p>
     </a>
+
   </div>
 
   <div class="cta-section">
-    <h2>Listo para empezar</h2>
-    <p>Explora nuestra tienda o crea tu arreglo personalizado</p>
+    <h2>Lista para alegrar tu día</h2>
+    <p>Explora cientos de flores o crea tu arreglo soñado en minutos</p>
     <div class="cta-buttons">
       <a routerLink="/tienda" class="btn-cta primary">Ver Tienda</a>
       <a routerLink="/arreglo-personalizado" class="btn-cta secondary">Crear Arreglo</a>
     </div>
   </div>
+
 </div>

@@ -2,9 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CarritoService } from '../../../services/carrito.service';
-import { AuthService } from '../../../services/auth.service';
-import { OrderService } from '../../../services/order.service';
-import { Order } from '../../../models/order.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-carrito',
@@ -31,24 +29,75 @@ export class Carrito {
     }
   }
 
-  async eliminarProducto(id: string): Promise<void> {
-    if (confirm('¿Eliminar este producto del carrito?')) {
-      await this.carritoService.removeProducto(id);
-    }
+  eliminarProducto(id: string): void {
+    Swal.fire({
+      title: '¿Eliminar producto?',
+      text: 'Se quitará este producto del carrito',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
+      if (result.isConfirmed) {
+        this.carritoService.removeProducto(id);
+      }
+    });
   }
 
   eliminarArreglo(id: string): void {
-    if (confirm('¿Eliminar este arreglo personalizado del carrito?')) {
-      this.carritoService.removeArregloPersonalizado(id);
-    }
+    Swal.fire({
+      title: '¿Eliminar arreglo?',
+      text: 'Se quitará este arreglo personalizado del carrito',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
+      if (result.isConfirmed) {
+        this.carritoService.removeArregloPersonalizado(id);
+      }
+    });
   }
 
-  async vaciarCarrito(): Promise<void> {
-    if (confirm('¿Estás seguro de vaciar todo el carrito?')) {
-      await this.carritoService.clearCarrito();
-    }
+  vaciarCarrito(): void {
+    Swal.fire({
+      title: '¿Vaciar carrito?',
+      text: 'Se eliminarán todos los productos y arreglos',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, vaciar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#e57399',
+      cancelButtonColor: '#ab6fc8',
+    }).then((result: import('sweetalert2').SweetAlertResult) => {
+      if (result.isConfirmed) {
+        this.carritoService.clearCarrito();
+        Swal.fire({
+          title: 'Carrito vacío',
+          icon: 'success',
+          confirmButtonColor: '#e57399',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    });
   }
 
+  procesarCompra(): void {
+    Swal.fire({
+      title: '¡Gracias por tu compra!',
+      text: 'Tu pedido ha sido recibido con éxito',
+      icon: 'success',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#e57399',
+      customClass: { popup: 'swal-floral' }
+    });
+    this.carritoService.clearCarrito();
+  }
   // carrito.ts - procesarCompra
 async procesarCompra(): Promise<void> {
   if (!this.authService.isAuthenticated()) {
@@ -111,14 +160,8 @@ async procesarCompra(): Promise<void> {
   onImageError(event: any): void {
     const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#f5f0ea;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#e8e3dc;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="100" height="100" fill="url(#bg)"/>
-        <text x="50%" y="60%" text-anchor="middle" font-size="40" fill="#d4cfc5" font-family="Arial, sans-serif">🌸</text>
+        <rect width="100" height="100" fill="#fce4ec"/>
+        <text x="50%" y="60%" text-anchor="middle" font-size="40" fill="#f8bbd0" font-family="Arial">✿</text>
       </svg>
     `);
     event.target.src = placeholder;

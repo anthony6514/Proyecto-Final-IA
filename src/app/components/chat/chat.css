@@ -1,7 +1,15 @@
+.chat-page {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 600px;
+  width: 100%;
+  max-width: 720px;
   background: var(--color-blanco);
   border: 2px solid var(--color-borde-suave);
   overflow: hidden;

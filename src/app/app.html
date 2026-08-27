@@ -21,7 +21,9 @@
 @if (authService.isAuthenticated()) {
   <nav class="navbar">
     <div class="nav-container">
-      <a class="brand" routerLink="/">FlorerIA</a>
+      <a class="brand" routerLink="/">
+        <img src="imagenes/favicon-96x96.png" alt="FlorerIA Logo" class="brand-logo">
+        FlorerIA</a>
       
       <div class="nav-links">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
