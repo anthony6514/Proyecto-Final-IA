@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Producto } from '../models/producto.model';
 import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
-import { PRODUCTOS_MOCK } from '../data/productos-mock';  // ✅ Importar correctamente
+import { PRODUCTOS_MOCK } from '../data/productos-mock';
 
 @Injectable({
   providedIn: 'root'
@@ -11,20 +11,25 @@ import { PRODUCTOS_MOCK } from '../data/productos-mock';  // ✅ Importar correc
 export class ProductosService {
   private apiUrl = environment.apiUrl;
   productos = signal<Producto[]>([]);
+  private loaded = false;  // ✅ Bandera para saber si ya se cargaron
 
   constructor(private http: HttpClient) {}
 
   // ✅ Cargar productos desde Firebase con MAPEO
   async cargarProductos(): Promise<void> {
+    // ✅ Si ya están cargados, no hacer nada
+    if (this.loaded && this.productos().length > 0) {
+      console.log('✅ Productos ya cargados, usando caché');
+      return;
+    }
+
     try {
-      // 🔥 Obtener datos del backend (campos en inglés)
       const productosBackend = await firstValueFrom(
         this.http.get<any[]>(`${this.apiUrl}/products`)
       );
       
       console.log('📦 Productos del backend (sin mapear):', productosBackend);
       
-      // ✅ MAPEAR los campos del backend al frontend
       const productosMapeados: Producto[] = productosBackend.map((p: any) => ({
         id: p.id || p.id,
         nombre: p.name || p.nombre || 'Sin nombre',
@@ -37,12 +42,12 @@ export class ProductosService {
       }));
       
       this.productos.set(productosMapeados);
+      this.loaded = true;  // ✅ Marcar como cargados
       console.log('✅ Productos mapeados:', this.productos().length);
       console.log('📝 Primer producto:', this.productos()[0]);
       
     } catch (error) {
       console.error('❌ Error al cargar productos:', error);
-      // ✅ Si hay error, usar MOCK como fallback
       this.cargarProductosMock();
     }
   }
@@ -50,9 +55,9 @@ export class ProductosService {
   // ✅ Fallback: Cargar desde MOCK si falla el backend
   private cargarProductosMock(): void {
     try {
-      // ✅ Usar el import directamente
       if (PRODUCTOS_MOCK && PRODUCTOS_MOCK.length > 0) {
         this.productos.set(PRODUCTOS_MOCK);
+        this.loaded = true;
         console.log('✅ Productos cargados desde MOCK:', PRODUCTOS_MOCK.length);
       } else {
         this.productos.set([]);
@@ -75,7 +80,6 @@ export class ProductosService {
         this.http.get<any>(`${this.apiUrl}/products/${id}`)
       );
       
-      // ✅ Mapear el producto individual
       if (producto) {
         return {
           id: producto.id,
@@ -95,12 +99,11 @@ export class ProductosService {
     }
   }
 
-  // ✅ Crear producto (envía en inglés al backend)
+  // ✅ Crear producto
   async createProducto(producto: Omit<Producto, 'id'>): Promise<Producto | null> {
     try {
       const headers = this.getAuthHeaders();
       
-      // ✅ Convertir de español a inglés para el backend
       const productoBackend = {
         name: producto.nombre,
         description: producto.descripcion,
@@ -115,7 +118,6 @@ export class ProductosService {
         this.http.post<any>(`${this.apiUrl}/products`, productoBackend, { headers })
       );
       
-      // ✅ Mapear la respuesta
       const productoMapeado: Producto = {
         id: nuevo.id,
         nombre: nuevo.name || producto.nombre,
@@ -142,7 +144,6 @@ export class ProductosService {
       const productoActual = this.productos().find(p => p.id === id);
       if (!productoActual) return false;
 
-      // ✅ Convertir updates de español a inglés
       const updatesBackend: any = {};
       if (updates.nombre !== undefined) updatesBackend.name = updates.nombre;
       if (updates.descripcion !== undefined) updatesBackend.description = updates.descripcion;
@@ -156,7 +157,6 @@ export class ProductosService {
         this.http.put(`${this.apiUrl}/products/${id}`, updatesBackend, { headers })
       );
 
-      // ✅ Actualizar en el frontend
       this.productos.update(lista => 
         lista.map(p => p.id === id ? { ...p, ...updates } : p)
       );

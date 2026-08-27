@@ -22,10 +22,8 @@ export class AuthService {
   isAuthenticated = signal<boolean>(false);
   isAdmin = signal<boolean>(false);
   
-  // ✅ Bandera para controlar el flujo de autenticación
   private isProcessingAuth = false;
   private isRegistering = false;
-  // ✅ NUEVA: Para evitar que el monitor dispare verificaciones innecesarias
   private isInitialLoad = true;
 
   constructor(private http: HttpClient) {
@@ -33,16 +31,13 @@ export class AuthService {
     this.monitorAuthState();
   }
 
-  // ✅ MONITOR: Solo se activa cuando NO estamos en login/registro
   private monitorAuthState(): void {
     onAuthStateChanged(auth, async (user) => {
-      // ⛔ Ignorar si estamos procesando autenticación
       if (this.isProcessingAuth || this.isRegistering) {
         console.log('⏳ Ignorando cambio de estado durante operación en curso');
         return;
       }
 
-      // ✅ Si es la primera carga y ya hay usuario, verificar
       if (this.isInitialLoad) {
         this.isInitialLoad = false;
         if (user) {
@@ -58,13 +53,11 @@ export class AuthService {
         return;
       }
 
-      // ⛔ Si ya estamos autenticados, no hacer nada
       if (this.isAuthenticated()) {
         console.log('✅ Usuario ya autenticado, monitor ignorado');
         return;
       }
       
-      // 🔥 SOLO cuando el usuario hace LOGIN manualmente
       if (user) {
         try {
           const token = await user.getIdToken();
@@ -80,9 +73,7 @@ export class AuthService {
     });
   }
 
-  // ✅ LOGIN: Correcto, solo una llamada
   async login(credentials: LoginCredentials): Promise<{ success: boolean; message: string; user?: Usuario }> {
-    // ⛔ Evitar login si ya estamos procesando
     if (this.isProcessingAuth) {
       console.log('⏳ Ya hay una operación en curso, espera...');
       return { success: false, message: 'Ya hay una operación en curso' };
@@ -99,9 +90,9 @@ export class AuthService {
       );
       
       const token = await userCredential.user.getIdToken();
+      console.log('🔑 Token obtenido, longitud:', token.length);
       localStorage.setItem('firebase_token', token);
       
-      // ✅ ÚNICA llamada a verifyToken desde login
       await this.verifyToken(token);
       
       console.log('✅ Login completado exitosamente');
@@ -123,8 +114,7 @@ export class AuthService {
     }
   }
 
-  // ✅ REGISTRO: Enviar rol en MAYÚSCULAS
-async register(data: RegisterData): Promise<{ success: boolean; message: string }> {
+  async register(data: RegisterData): Promise<{ success: boolean; message: string }> {
     if (this.isProcessingAuth) {
         return { success: false, message: 'Ya hay una operación en curso' };
     }
@@ -143,14 +133,13 @@ async register(data: RegisterData): Promise<{ success: boolean; message: string 
         
         console.log('2️⃣ Registro exitoso en Firebase');
         
-        // ✅ ENVIAR REGISTRO al backend (rol en MAYÚSCULAS)
         try {
             await firstValueFrom(
                 this.http.post(`${this.apiUrl}/auth/register`, {
                     uid: userCredential.user.uid,
                     email: data.email,
                     nombre: data.nombre || data.email.split('@')[0],
-                    rol: 'CLIENT'  // ✅ En MAYÚSCULAS
+                    rol: 'CLIENT'
                 })
             );
             console.log('✅ Usuario creado en Realtime Database');
@@ -160,7 +149,6 @@ async register(data: RegisterData): Promise<{ success: boolean; message: string 
             throw new Error('Error al crear el usuario en la base de datos');
         }
         
-        // CERRAR SESIÓN
         await signOut(auth);
         this.clearAuthState();
         
@@ -183,12 +171,19 @@ async register(data: RegisterData): Promise<{ success: boolean; message: string 
             message: this.getFirebaseErrorMessage(error.code) 
         };
     }
-}
+  }
 
-// ✅ VERIFY TOKEN - Mapear correctamente el usuario
-private async verifyToken(token: string): Promise<void> {
+  // ✅ VERIFY TOKEN - CORREGIDO CON MANEJO DE ERRORES
+  private async verifyToken(token: string): Promise<void> {
     try {
+        // ✅ VERIFICAR QUE EL TOKEN NO SEA NULO O VACÍO
+        if (!token || token.length < 10) {
+            console.error('❌ Token inválido o demasiado corto:', token);
+            throw new Error('Token inválido');
+        }
+        
         console.log('🔍 Verificando token con backend...');
+        console.log('🔑 Token preview:', token.substring(0, 30) + '...');
         
         const response = await firstValueFrom(
             this.http.post<{ uid: string, email: string, user: any }>(
@@ -199,14 +194,12 @@ private async verifyToken(token: string): Promise<void> {
         
         console.log('✅ Token verificado:', response);
         
-        // 🔥 Mapear correctamente el usuario del backend
         const backendUser = response.user;
         const user: Usuario = {
             id: response.uid,
             nombre: backendUser?.fullName || response.email.split('@')[0],
             email: response.email,
             password: '',
-            // 🔥 El backend devuelve 'role' (con 'e'), el frontend usa 'rol' (con 'l')
             rol: backendUser?.role?.toLowerCase() === 'admin' ? 'admin' : 'usuario',
             fechaRegistro: backendUser?.createdAt ? new Date(backendUser.createdAt) : new Date()
         };
@@ -219,11 +212,11 @@ private async verifyToken(token: string): Promise<void> {
         console.log('✅ Usuario autenticado:', user.email);
     } catch (error) {
         console.error('❌ Error al verificar token:', error);
+        this.clearAuthState();
         throw error;
     }
-}
+  }
 
-  // ✅ LOGOUT: Limpieza completa
   async logout(): Promise<void> {
     try {
       await signOut(auth);
@@ -235,7 +228,6 @@ private async verifyToken(token: string): Promise<void> {
     this.isRegistering = false;
   }
 
-  // ✅ LIMPIAR ESTADO
   private clearAuthState(): void {
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
@@ -244,7 +236,6 @@ private async verifyToken(token: string): Promise<void> {
     localStorage.removeItem('firebase_token');
   }
 
-  // ✅ CARGAR USUARIO DESDE LOCALSTORAGE
   private loadCurrentUser(): void {
     const userData = localStorage.getItem(this.CURRENT_USER_KEY);
     if (userData) {
@@ -261,7 +252,6 @@ private async verifyToken(token: string): Promise<void> {
     }
   }
 
-  // ✅ MÉTODOS PÚBLICOS
   getCurrentUser(): Usuario | null {
     return this.currentUser();
   }
@@ -274,7 +264,6 @@ private async verifyToken(token: string): Promise<void> {
     return this.isAuthenticated();
   }
 
-  // ✅ MANEJO DE ERRORES
   private getFirebaseErrorMessage(code: string): string {
     const errors: { [key: string]: string } = {
       'auth/user-not-found': 'Usuario no encontrado',

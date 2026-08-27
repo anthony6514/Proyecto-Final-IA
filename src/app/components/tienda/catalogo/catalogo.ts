@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';  // ✅ Agregar Router
+import { Router } from '@angular/router';
 import { ProductosService } from '../../../services/productos.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { AuthService } from '../../../services/auth.service';
@@ -26,7 +26,7 @@ export class Catalogo implements OnInit {
     public productosService: ProductosService,
     private carritoService: CarritoService,
     public authService: AuthService,
-    private router: Router  // ✅ Inyectar Router
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -35,6 +35,18 @@ export class Catalogo implements OnInit {
 
   async cargarProductos(): Promise<void> {
     this.loading = true;
+    
+    // ✅ Si los productos ya están cargados (desde app.ts), usarlos inmediatamente
+    if (this.productosService.getProductos().length > 0) {
+      this.productos = this.productosService.getProductos();
+      this.categorias = this.productosService.getCategorias();
+      this.aplicarFiltros();
+      this.loading = false;
+      console.log('✅ Productos usados desde caché');
+      return;
+    }
+    
+    // ✅ Si no hay productos, cargarlos desde el backend
     await this.productosService.cargarProductos();
     this.productos = this.productosService.getProductos();
     this.categorias = this.productosService.getCategorias();
@@ -83,7 +95,7 @@ export class Catalogo implements OnInit {
 
     if (!this.authService.isAuthenticated()) {
       alert('Por favor, inicia sesión para agregar productos al carrito');
-      this.router.navigate(['/login']);  // ✅ Redirigir al login
+      this.router.navigate(['/login']);
       return;
     }
 
@@ -92,7 +104,7 @@ export class Catalogo implements OnInit {
       cantidad: 1
     };
 
-    await this.carritoService.addProducto(productoCarrito);  // ✅ Usar await
+    await this.carritoService.addProducto(productoCarrito);
     this.mostrarNotificacion(`${producto.nombre} añadido al carrito`);
   }
 
@@ -134,9 +146,13 @@ export class Catalogo implements OnInit {
 
   getCategoriaLabel(categoria: string): string {
     const labels: { [key: string]: string } = {
-      'todos': 'Todos', 'rosas': 'Rosas', 'tulipanes': 'Tulipanes',
-      'girasoles': 'Girasoles', 'orquideas': 'Orquídeas',
-      'lirios': 'Lirios', 'otros': 'Otros'
+      'todos': 'Todos',
+      'rosas': 'Rosas',
+      'tulipanes': 'Tulipanes',
+      'girasoles': 'Girasoles',
+      'orquideas': 'Orquídeas',
+      'lirios': 'Lirios',
+      'otros': 'Otros'
     };
     return labels[categoria] || categoria;
   }

@@ -1,7 +1,7 @@
+// src/app/services/order.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 import { Order, OrderStatus } from '../models/order.model';
 import { environment } from '../../environments/environment';
 
@@ -21,19 +21,37 @@ export class OrderService {
     });
   }
 
-  // 🔥 Obtener todos los pedidos (admin)
+  // ✅ OBTENER TODOS LOS PEDIDOS (ADMIN) - Endpoint específico
   async getAllOrders(): Promise<Order[]> {
     try {
-      return await firstValueFrom(
+      console.log('📦 Obteniendo TODOS los pedidos (admin)...');
+      // ✅ Usar el mismo endpoint pero con un parámetro o header especial
+      const result = await firstValueFrom(
+        this.http.get<Order[]>(`${this.apiUrl}/admin/all`, { headers: this.getHeaders() })
+      );
+      console.log('✅ Pedidos obtenidos:', result?.length || 0);
+      return result || [];
+    } catch (error) {
+      console.error('❌ Error al obtener todos los pedidos:', error);
+      // ✅ FALLBACK: Si el endpoint admin no existe, usar el normal pero filtrar
+      return this.getUserOrders();
+    }
+  }
+
+  // ✅ OBTENER PEDIDOS DEL USUARIO ACTUAL
+  async getUserOrders(): Promise<Order[]> {
+    try {
+      const result = await firstValueFrom(
         this.http.get<Order[]>(this.apiUrl, { headers: this.getHeaders() })
       );
+      return result || [];
     } catch (error) {
-      console.error('❌ Error al obtener pedidos:', error);
+      console.error('❌ Error al obtener pedidos del usuario:', error);
       return [];
     }
   }
 
-  // 🔥 Obtener pedido por ID
+  // ✅ OBTENER PEDIDO POR ID
   async getOrderById(id: string): Promise<Order | null> {
     try {
       return await firstValueFrom(
@@ -45,52 +63,45 @@ export class OrderService {
     }
   }
 
-  // 🔥 Obtener pedidos del usuario actual
-  async getUserOrders(): Promise<Order[]> {
-    try {
-      return await firstValueFrom(
-        this.http.get<Order[]>(this.apiUrl, { headers: this.getHeaders() })
-      );
-    } catch (error) {
-      console.error('❌ Error al obtener pedidos del usuario:', error);
-      return [];
-    }
-  }
-
-  // ✅ CREAR PEDIDO - CORREGIDO
+  // ✅ CREAR PEDIDO
   async createOrder(orderData: any): Promise<Order | null> {
     try {
       console.log('📤 Enviando al backend:', orderData);
-      
       const result = await firstValueFrom(
         this.http.post<Order>(this.apiUrl, orderData, { headers: this.getHeaders() })
       );
-      
       console.log('✅ Pedido creado:', result);
       return result;
     } catch (error) {
       console.error('❌ Error al crear pedido:', error);
-      throw error;  // ✅ Lanzar el error para que el carrito lo maneje
+      throw error;
     }
   }
 
-  // 🔥 Actualizar estado del pedido
-  async updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order | null> {
+  // ✅ Actualizar estado del pedido - CORREGIDO
+async updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order | null> {
     try {
-      return await firstValueFrom(
-        this.http.patch<Order>(
-          `${this.apiUrl}/${orderId}/status`,
-          { status },
-          { headers: this.getHeaders() }
-        )
-      );
+        console.log(`🔄 Actualizando pedido ${orderId} a estado: ${status}`);
+        
+        const body = { status: status };
+        console.log('📤 Enviando body:', body);
+        
+        const result = await firstValueFrom(
+            this.http.patch<Order>(
+                `${this.apiUrl}/${orderId}/status`,
+                body,
+                { headers: this.getHeaders() }
+            )
+        );
+        console.log('✅ Estado actualizado:', result);
+        return result;
     } catch (error) {
-      console.error('❌ Error al actualizar estado:', error);
-      return null;
+        console.error('❌ Error al actualizar estado:', error);
+        return null;
     }
-  }
+}
 
-  // 🔥 Eliminar pedido
+  // ✅ ELIMINAR PEDIDO
   async deleteOrder(orderId: string): Promise<boolean> {
     try {
       await firstValueFrom(

@@ -1,98 +1,100 @@
+<!-- src/app/components/admin/pedidos-admin/pedidos-admin.html -->
 <div class="pedidos-admin-container">
 
-  <!-- Header — siempre visible -->
+  <!-- Header -->
   <div class="admin-header">
-    <h1>Gestión de Pedidos</h1>
+    <h1>📦 Gestión de Pedidos</h1>
     <p>Administra y actualiza el estado de todos los pedidos</p>
   </div>
 
-  <!-- Stats Cards — siempre visibles -->
+  <!-- Stats Cards -->
   <div class="stats-grid">
-    <div class="stat-card stat-total">
+    <div class="stat-card stat-total" (click)="filterStatus = 'TODOS'; aplicarFiltros()">
       <div class="stat-content">
-        <div class="stat-label">Total Pedidos</div>
+        <div class="stat-label">📊 Total Pedidos</div>
         <div class="stat-value">{{ getStatsCount('TODOS') }}</div>
       </div>
     </div>
-    <div class="stat-card stat-pending">
+    <div class="stat-card stat-pending" (click)="filterStatus = 'PENDIENTE'; aplicarFiltros()">
       <div class="stat-content">
-        <div class="stat-label">Pendientes</div>
+        <div class="stat-label">📋 Pendientes</div>
         <div class="stat-value">{{ getStatsCount('PENDIENTE') }}</div>
       </div>
     </div>
-    <div class="stat-card stat-completed">
+    <div class="stat-card stat-progress" (click)="filterStatus = 'EN_PROCESO'; aplicarFiltros()">
       <div class="stat-content">
-        <div class="stat-label">Completados</div>
-        <div class="stat-value">{{ getStatsCount('COMPLETADO') }}</div>
+        <div class="stat-label">🔄 En Proceso</div>
+        <div class="stat-value">{{ getStatsCount('EN_PROCESO') }}</div>
       </div>
     </div>
-    <div class="stat-card stat-revenue">
+    <div class="stat-card stat-completed" (click)="filterStatus = 'COMPLETADO'; aplicarFiltros()">
       <div class="stat-content">
-        <div class="stat-label">Ingresos Totales</div>
-        <div class="stat-value">{{ formatCurrency(getTotalRevenue()) }}</div>
+        <div class="stat-label">✅ Completados</div>
+        <div class="stat-value">{{ getStatsCount('COMPLETADO') }}</div>
       </div>
     </div>
   </div>
 
-  <!-- Loading State -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <div class="spinner"></div>
     <p>Cargando pedidos...</p>
   </div>
 
-  <!-- Error Message -->
+  <!-- Error -->
   <div *ngIf="!isLoading && errorMessage" class="error-message">
     <strong>⚠️ {{ errorMessage }}</strong>
-    <button (click)="loadOrders()" class="btn-retry">🔄 Reintentar</button>
+    <button (click)="cargarPedidos()" class="btn-retry">🔄 Reintentar</button>
   </div>
 
-  <!-- Contenido principal — solo cuando no está cargando -->
+  <!-- Contenido principal -->
   <ng-container *ngIf="!isLoading">
 
-    <!-- Filters -->
+    <!-- Filtros -->
     <div class="filters-section">
       <div class="filter-group">
-        <label>Buscar</label>
+        <label>🔍 Buscar</label>
         <input
           type="text"
           [(ngModel)]="searchTerm"
-          (ngModelChange)="onSearchChange()"
+          (ngModelChange)="aplicarFiltros()"
           placeholder="Buscar por nombre, email o ID..."
         />
       </div>
       <div class="filter-group">
-        <label>Filtrar por estado</label>
-        <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+        <label>📊 Filtrar por estado</label>
+        <select [(ngModel)]="filterStatus" (ngModelChange)="aplicarFiltros()">
           <option value="TODOS">Todos los estados</option>
-          <option value="PENDIENTE">Pendientes</option>
-          <option value="COMPLETADO">Completados</option>
-          <option value="CANCELADO">Cancelados</option>
+          <option value="PENDIENTE">📋 Pendientes</option>
+          <option value="EN_PROCESO">🔄 En Proceso</option>
+          <option value="COMPLETADO">✅ Completados</option>
+          <option value="CANCELADO">❌ Cancelados</option>
         </select>
       </div>
+      <button (click)="cargarPedidos()" class="btn-reload">🔄 Recargar</button>
     </div>
 
-    <!-- Orders Table -->
+    <!-- Tabla -->
     <div *ngIf="filteredOrders.length > 0" class="table-container">
       <table class="orders-table">
         <thead>
           <tr>
-            <th>ID Pedido</th>
-            <th>Cliente</th>
-            <th>Fecha</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>🆔 Pedido</th>
+            <th>👤 Cliente</th>
+            <th>📅 Fecha</th>
+            <th>💰 Total</th>
+            <th>📊 Estado</th>
+            <th>📦 Productos</th>
+            <th>⚡ Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let order of filteredOrders">
-            <td>
-              <span class="order-id">{{ order.id.substring(0, 8) }}...</span>
-            </td>
+            <td><span class="order-id">{{ order.id.substring(0, 8) }}...</span></td>
             <td>
               <div class="customer-info">
-                <div class="customer-name">{{ order.userName }}</div>
-                <div class="customer-email">{{ order.userEmail }}</div>
+                <div class="customer-name">{{ order.userName || 'Usuario' }}</div>
+                <div class="customer-email">{{ order.userEmail || 'Sin email' }}</div>
               </div>
             </td>
             <td>{{ formatDate(order.createdAt) }}</td>
@@ -101,19 +103,18 @@
               <select
                 [ngModel]="order.status"
                 (ngModelChange)="updateOrderStatus(order, $event)"
-                [disabled]="order.status !== OrderStatus.PENDIENTE"
                 class="status-select"
-                [ngClass]="'status-' + order.status.toLowerCase()"
+                [ngClass]="'status-' + getStatusClass(order.status)"
               >
-                <option *ngFor="let status of getOrderStatusOptions(order.status)" [value]="status">
-                  {{ ORDER_STATUS_LABELS[status] }}
+                <option *ngFor="let opt of statusOptions" [value]="opt.value">
+                  {{ opt.label }}
                 </option>
               </select>
             </td>
+            <td><span class="product-count">{{ (order.items && order.items.length) || 0 }} productos</span></td>
             <td>
-              <button (click)="viewOrderDetails(order)" class="btn-view">
-                Ver detalles
-              </button>
+              <button (click)="verDetalles(order)" class="btn-view">👁️ Ver</button>
+              <button (click)="eliminarPedido(order)" class="btn-delete">🗑️</button>
             </td>
           </tr>
         </tbody>
@@ -122,7 +123,7 @@
 
     <!-- Empty State -->
     <div *ngIf="filteredOrders.length === 0 && !errorMessage" class="empty-state">
-      <div class="empty-icon">📋</div>
+      <div class="empty-icon">🌸</div>
       <p>No hay pedidos para mostrar</p>
       <span>{{ searchTerm || filterStatus !== 'TODOS' ? 'Intenta cambiar los filtros' : 'Aún no se han realizado pedidos' }}</span>
     </div>
@@ -131,69 +132,41 @@
 
 </div>
 
-<!-- Order Details Modal -->
-<div *ngIf="selectedOrder" class="modal-overlay" (click)="closeOrderDetails()">
+<!-- Modal de Detalles -->
+<div *ngIf="selectedOrder" class="modal-overlay" (click)="cerrarDetalles()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Detalles del Pedido</h2>
-      <button class="btn-close" (click)="closeOrderDetails()">×</button>
+      <h2>📦 Detalles del Pedido</h2>
+      <button class="btn-close" (click)="cerrarDetalles()">✕</button>
     </div>
 
     <div class="modal-body">
       <div class="details-grid">
         <div class="detail-section">
-          <h3>Información del Cliente</h3>
-          <div class="detail-item">
-            <span class="label">Nombre:</span>
-            <span class="value">{{ selectedOrder.userName }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Email:</span>
-            <span class="value">{{ selectedOrder.userEmail }}</span>
-          </div>
-          <div *ngIf="selectedOrder.phoneNumber" class="detail-item">
-            <span class="label">Teléfono:</span>
-            <span class="value">{{ selectedOrder.phoneNumber }}</span>
-          </div>
-          <div *ngIf="selectedOrder.shippingAddress" class="detail-item">
-            <span class="label">Dirección:</span>
-            <span class="value">{{ selectedOrder.shippingAddress }}</span>
-          </div>
+          <h3>👤 Cliente</h3>
+          <div class="detail-item"><span class="label">Nombre:</span><span class="value">{{ selectedOrder.userName || 'N/A' }}</span></div>
+          <div class="detail-item"><span class="label">Email:</span><span class="value">{{ selectedOrder.userEmail || 'N/A' }}</span></div>
+          <div class="detail-item" *ngIf="selectedOrder.phoneNumber"><span class="label">Teléfono:</span><span class="value">{{ selectedOrder.phoneNumber }}</span></div>
+          <div class="detail-item" *ngIf="selectedOrder.shippingAddress"><span class="label">Dirección:</span><span class="value">{{ selectedOrder.shippingAddress }}</span></div>
         </div>
-
         <div class="detail-section">
-          <h3>Información del Pedido</h3>
-          <div class="detail-item">
-            <span class="label">ID:</span>
-            <span class="value">{{ selectedOrder.id }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Fecha:</span>
-            <span class="value">{{ formatDate(selectedOrder.createdAt) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Estado:</span>
-            <span class="badge" [ngClass]="'badge-' + selectedOrder.status.toLowerCase()">
-              {{ ORDER_STATUS_LABELS[selectedOrder.status] }}
+          <h3>📋 Información</h3>
+          <div class="detail-item"><span class="label">ID:</span><span class="value">{{ selectedOrder.id }}</span></div>
+          <div class="detail-item"><span class="label">Fecha:</span><span class="value">{{ formatDate(selectedOrder.createdAt) }}</span></div>
+          <div class="detail-item"><span class="label">Estado:</span>
+            <span class="badge" [ngClass]="'badge-' + getStatusClass(selectedOrder.status)">
+              {{ getStatusLabel(selectedOrder.status) }}
             </span>
           </div>
-          <div class="detail-item">
-            <span class="label">Total:</span>
-            <span class="value total">{{ formatCurrency(selectedOrder.total) }}</span>
-          </div>
+          <div class="detail-item"><span class="label">Total:</span><span class="value total">{{ formatCurrency(selectedOrder.total) }}</span></div>
         </div>
       </div>
 
       <div class="products-section">
-        <h3>Productos del Pedido</h3>
+        <h3>📦 Productos</h3>
         <table class="products-table">
           <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Precio Unit.</th>
-              <th>Subtotal</th>
-            </tr>
+            <tr><th>Producto</th><th>Cantidad</th><th>Precio Unit.</th><th>Subtotal</th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of selectedOrder.items">
@@ -204,8 +177,8 @@
                 </div>
               </td>
               <td>{{ item.quantity }}</td>
-              <td>{{ formatCurrency(item.price) }}</td>
-              <td class="subtotal">{{ formatCurrency(item.price * item.quantity) }}</td>
+              <td>{{ formatCurrency(item.unitPrice || item.price || 0) }}</td>
+              <td>{{ formatCurrency(item.subtotal || (item.price * item.quantity) || 0) }}</td>
             </tr>
           </tbody>
         </table>
@@ -213,19 +186,13 @@
     </div>
 
     <div class="modal-footer">
-      <button *ngIf="selectedOrder.status === OrderStatus.PENDIENTE"
-              (click)="updateOrderStatus(selectedOrder, OrderStatus.COMPLETADO); closeOrderDetails()"
-              class="btn-success">
-        Marcar como Completado
-      </button>
-      <button *ngIf="selectedOrder.status === OrderStatus.PENDIENTE"
-              (click)="updateOrderStatus(selectedOrder, OrderStatus.CANCELADO); closeOrderDetails()"
-              class="btn-danger">
-        Cancelar Pedido
-      </button>
-      <button (click)="closeOrderDetails()" class="btn-secondary">
-        Cerrar
-      </button>
+      <button *ngIf="selectedOrder.status !== OrderStatus.COMPLETADO && selectedOrder.status !== OrderStatus.CANCELADO"
+              (click)="updateOrderStatus(selectedOrder, OrderStatus.COMPLETADO); cerrarDetalles()"
+              class="btn-success">✅ Completar</button>
+      <button *ngIf="selectedOrder.status !== OrderStatus.CANCELADO && selectedOrder.status !== OrderStatus.COMPLETADO"
+              (click)="updateOrderStatus(selectedOrder, OrderStatus.CANCELADO); cerrarDetalles()"
+              class="btn-danger">❌ Cancelar</button>
+      <button (click)="cerrarDetalles()" class="btn-secondary">Cerrar</button>
     </div>
   </div>
 </div>

@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/rou
 import { AuthService } from './services/auth.service';
 import { CarritoService } from './services/carrito.service';
 import Swal from 'sweetalert2';
+import { ProductosService } from './services/productos.service';
 
 @Component({
   selector: 'app-root',
