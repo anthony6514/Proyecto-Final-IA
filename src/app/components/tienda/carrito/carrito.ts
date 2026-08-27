@@ -16,13 +16,19 @@ export class Carrito {
 
   constructor(public carritoService: CarritoService) {}
 
-  aumentarCantidad(id: string, cantidadActual: number): void {
-    this.carritoService.updateCantidad(id, cantidadActual + 1);
+  constructor(
+    public carritoService: CarritoService,
+    public authService: AuthService,
+    private orderService: OrderService
+  ) {}
+
+  async aumentarCantidad(id: string, cantidadActual: number): Promise<void> {
+    await this.carritoService.updateCantidad(id, cantidadActual + 1);
   }
 
-  disminuirCantidad(id: string, cantidadActual: number): void {
+  async disminuirCantidad(id: string, cantidadActual: number): Promise<void> {
     if (cantidadActual > 1) {
-      this.carritoService.updateCantidad(id, cantidadActual - 1);
+      await this.carritoService.updateCantidad(id, cantidadActual - 1);
     }
   }
 
@@ -120,6 +126,64 @@ export class Carrito {
       this.procesando = false;
     }
   }
+  // carrito.ts - procesarCompra
+async procesarCompra(): Promise<void> {
+  if (!this.authService.isAuthenticated()) {
+    alert('Por favor, inicia sesión para realizar una compra');
+    return;
+  }
+
+  if (this.carritoService.cantidadTotal() === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
+
+  this.procesando = true;
+  try {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      alert('Usuario no encontrado');
+      return;
+    }
+
+    // ✅ CREAR EL PEDIDO CON EL FORMATO CORRECTO
+    const items = this.carritoService.getItems().map(item => ({
+      productId: item.id,
+      productName: item.nombre,
+      quantity: item.cantidad,
+      unitPrice: item.precio,        // ✅ Cambiar price a unitPrice
+      subtotal: item.precio * item.cantidad,  // ✅ Agregar subtotal
+      notes: ''
+    }));
+
+    const orderData = {
+      userId: user.id,
+      userName: user.nombre,
+      userEmail: user.email,
+      shippingAddress: 'Dirección de entrega',
+      paymentMethod: 'Efectivo',
+      notes: 'Pedido desde FlorerIA',
+      items: items,
+      total: this.carritoService.getPrecioTotal(),
+      status: 'PENDIENTE'
+    };
+
+    console.log('📦 Enviando pedido al backend:', orderData);
+
+    const created = await this.orderService.createOrder(orderData);
+    if (created) {
+      alert('✅ ¡Pedido creado exitosamente!');
+      await this.carritoService.clearCarrito();
+    } else {
+      alert('❌ Error al crear el pedido');
+    }
+  } catch (error) {
+    console.error('❌ Error al procesar compra:', error);
+    alert('Error al procesar la compra: ' + (error as any).message);
+  } finally {
+    this.procesando = false;
+  }
+}
 
   onImageError(event: any): void {
     const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';  // ✅ Agregar Router
 import { ProductosService } from '../../../services/productos.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { AuthService } from '../../../services/auth.service';
@@ -19,28 +20,35 @@ export class Catalogo implements OnInit {
   categoriaSeleccionada = 'todos';
   terminoBusqueda = '';
   categorias: string[] = [];
+  loading = true;
 
   constructor(
     public productosService: ProductosService,
     private carritoService: CarritoService,
-    public authService: AuthService
+    public authService: AuthService,
+    private router: Router  // ✅ Inyectar Router
   ) {}
 
-  ngOnInit(): void {
-    this.cargarProductos();
-    this.categorias = this.productosService.getCategorias();
+  async ngOnInit(): Promise<void> {
+    await this.cargarProductos();
   }
 
-  cargarProductos(): void {
+  async cargarProductos(): Promise<void> {
+    this.loading = true;
+    await this.productosService.cargarProductos();
     this.productos = this.productosService.getProductos();
+    this.categorias = this.productosService.getCategorias();
     this.aplicarFiltros();
+    this.loading = false;
   }
 
   aplicarFiltros(): void {
     let resultado = this.productos;
+
     if (this.categoriaSeleccionada !== 'todos') {
       resultado = resultado.filter(p => p.categoria === this.categoriaSeleccionada);
     }
+
     if (this.terminoBusqueda.trim()) {
       const termino = this.terminoBusqueda.toLowerCase();
       resultado = resultado.filter(p =>
@@ -60,7 +68,7 @@ export class Catalogo implements OnInit {
     this.aplicarFiltros();
   }
 
-  agregarAlCarrito(producto: Producto): void {
+  async agregarAlCarrito(producto: Producto): Promise<void> {
     if (producto.stock === 0) {
       Swal.fire({
         title: 'Sin stock',
@@ -72,8 +80,19 @@ export class Catalogo implements OnInit {
       });
       return;
     }
-    const productoCarrito: ProductoCarrito = { ...producto, cantidad: 1 };
-    this.carritoService.addProducto(productoCarrito);
+
+    if (!this.authService.isAuthenticated()) {
+      alert('Por favor, inicia sesión para agregar productos al carrito');
+      this.router.navigate(['/login']);  // ✅ Redirigir al login
+      return;
+    }
+
+    const productoCarrito: ProductoCarrito = {
+      ...producto,
+      cantidad: 1
+    };
+
+    await this.carritoService.addProducto(productoCarrito);  // ✅ Usar await
     this.mostrarNotificacion(`${producto.nombre} añadido al carrito`);
   }
 

@@ -31,26 +31,23 @@ export class PedidosAdmin implements OnInit {
     this.loadOrders();
   }
 
-  loadOrders(): void {
+  // ✅ CORREGIDO: Cambiar a async/await
+  async loadOrders(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
     
-    this.orderService.getAllOrders().subscribe({
-      next: (orders) => {
-        this.orders = orders.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading orders:', error);
-        this.errorMessage = 'No se pudieron cargar los pedidos. Verifica que el servidor esté activo.';
-        this.isLoading = false;
-        this.orders = [];
-        this.filteredOrders = [];
-      }
-    });
+    try {
+      const orders = await this.orderService.getAllOrders();
+      this.orders = orders.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      this.applyFilters();
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      this.errorMessage = 'Error al cargar los pedidos. Por favor, intenta de nuevo.';
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   applyFilters(): void {
@@ -73,8 +70,11 @@ export class PedidosAdmin implements OnInit {
     this.applyFilters();
   }
 
-  updateOrderStatus(order: Order, newStatus: OrderStatus): void {
-    if (order.status === newStatus) return;
+  // ✅ CORREGIDO: Cambiar a async/await
+  async updateOrderStatus(order: Order, newStatus: OrderStatus): Promise<void> {
+    if (order.status === newStatus) {
+      return;
+    }
 
     Swal.fire({
       title: '¿Cambiar estado?',
